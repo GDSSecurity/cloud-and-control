@@ -1,0 +1,30 @@
+bin $ ls | grep sample
+lrwxrwxrwx 1 tom  people cudahashcat+-7zwordlist_assimilator -> sample_assimilator
+lrwxrwxrwx 1 tom  people cudahashcat+-7zwordlist_validator -> sample_bitwise_validator
+lrwxrwxrwx 1 tom  apache cudahashcat+_assimilator -> sample_assimilator
+lrwxrwxrwx 1 tom  apache cudahashcat+_validator -> sample_bitwise_validator
+lrwxrwxrwx 1 tom  apache gnfs-lasieve4I11e_assimilator -> sample_assimilator
+lrwxrwxrwx 1 tom  apache gnfs-lasieve4I11e_validator -> sample_bitwise_validator
+lrwxrwxrwx 1 tom  apache gnfs-lasieve4I12e_assimilator -> sample_assimilator
+lrwxrwxrwx 1 tom  apache gnfs-lasieve4I12e_validator -> sample_bitwise_validator
+lrwxrwxrwx 1 tom  apache gnfs-lasieve4I13e_assimilator -> sample_assimilator
+lrwxrwxrwx 1 tom  apache gnfs-lasieve4I13e_validator -> sample_bitwise_validator
+lrwxrwxrwx 1 tom  apache gnfs-lasieve4I14e_assimilator -> sample_assimilator
+lrwxrwxrwx 1 tom  apache gnfs-lasieve4I14e_validator -> sample_bitwise_validator
+lrwxrwxrwx 1 tom  apache gnfs-lasieve4I15e_assimilator -> sample_assimilator
+lrwxrwxrwx 1 tom  apache gnfs-lasieve4I15e_validator -> sample_bitwise_validator
+lrwxrwxrwx 1 tom  apache gnfs-lasieve4I16e_assimilator -> sample_assimilator
+lrwxrwxrwx 1 tom  apache gnfs-lasieve4I16e_validator -> sample_bitwise_validator
+lrwxrwxrwx 1 tom  people hashcat-7zwordlist_assimilator -> sample_assimilator
+lrwxrwxrwx 1 tom  people hashcat-7zwordlist_validator -> sample_bitwise_validator
+lrwxrwxrwx 1 tom  apache hashcat_assimilator -> sample_assimilator
+lrwxrwxrwx 1 tom  apache hashcat_validator -> sample_bitwise_validator
+lrwxrwxrwx 1 tom  apache john_assimilator -> sample_assimilator
+lrwxrwxrwx 1 tom  apache john_validator -> sample_bitwise_validator
+lrwxrwxrwx 1 tom  apache msieve_assimilator -> sample_assimilator
+lrwxrwxrwx 1 tom  apache msieve_validator -> sample_bitwise_validator
+-rwxr-xr-x 1 tom  apache sample_assimilator
+-rwxr-xr-x 1 tom  apache sample_bitwise_validator
+-rwxr-xr-x 1 tom  apache sample_dummy_assimilator
+-rwxr-xr-x 1 tom  apache sample_trivial_validator
+-rwxr-xr-x 1 tom  apache sample_work_generator

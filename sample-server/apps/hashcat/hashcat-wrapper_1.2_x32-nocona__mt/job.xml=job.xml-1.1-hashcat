@@ -1,0 +1,8 @@
+<job_desc>
+    <task>
+        <application>hashcat</application>
+	<command_line>--output-file=john.pot --output-format=0</command_line>
+        <stdout_filename>task-stdout</stdout_filename>
+        <stdout_filename>task-stderr</stdout_filename>
+    </task>
+</job_desc>

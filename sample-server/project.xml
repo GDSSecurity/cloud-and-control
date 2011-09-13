@@ -1,0 +1,80 @@
+<boinc>
+    <platform>
+        <name>x32-k8</name>
+        <user_friendly_name>32 Bit, compiled with -march=k8</user_friendly_name>
+    </platform>
+    <platform>
+        <name>x32-nocona</name>
+        <user_friendly_name>32 Bit, compiled with -march=nocona</user_friendly_name>
+    </platform>
+    <platform>
+        <name>x64-corei7</name>
+        <user_friendly_name>64 Bit, compiled with -march=native on a corei7 machine with gcc4.4</user_friendly_name>
+    </platform>
+    <platform>
+        <name>x64-xeon</name>
+        <user_friendly_name>64 Bit, compiled with -march=native on a xeon machine with gcc4.4</user_friendly_name>
+    </platform>
+    <platform>
+        <name>x32-barcelona</name>
+        <user_friendly_name>32 Bit, compiled with -march=barcelona</user_friendly_name>
+    </platform>
+    <platform>
+        <name>winx86</name>
+        <user_friendly_name>pre-compiled windows binary x86</user_friendly_name>
+    </platform>
+    <platform>
+        <name>anonymous</name>
+        <user_friendly_name>user-supplied-binary</user_friendly_name>
+    </platform>
+	
+	
+    <app>
+      <name>john</name>
+      <user_friendly_name>vanilla version of john the ripper</user_friendly_name>
+    </app>
+    <app>
+      <name>hashcat</name>
+      <user_friendly_name>vanilla version of hashcat</user_friendly_name>
+    </app>
+    <app>
+      <name>hashcat-7zwordlist</name>
+      <user_friendly_name>a version of hashcat that expects a 7zipped wordlist it will decompress first</user_friendly_name>
+    </app>
+    <app>
+      <name>cudahashcat+</name>
+      <user_friendly_name>vanilla version of cudahashcat+</user_friendly_name>
+    </app>
+    <app>
+      <name>cudahashcat+-7zwordlist</name>
+      <user_friendly_name>a version of cudahashcat+ that expects a 7zipped wordlist it will decompress first</user_friendly_name>
+    </app>
+    <app>
+        <name>msieve</name>
+        <user_friendly_name>msieve by jasonp</user_friendly_name>
+    </app>
+    <app>
+        <name>gnfslasieve4I11e</name>
+        <user_friendly_name>GGNFS Siever v11</user_friendly_name>
+    </app>
+    <app>
+        <name>gnfslasieve4I12e</name>
+        <user_friendly_name>GGNFS Siever v12</user_friendly_name>
+    </app>
+    <app>
+        <name>gnfslasieve4I13e</name>
+        <user_friendly_name>GGNFS Siever v13</user_friendly_name>
+    </app>
+    <app>
+        <name>gnfslasieve4I14e</name>
+        <user_friendly_name>GGNFS Siever v14</user_friendly_name>
+    </app>
+    <app>
+        <name>gnfslasieve4I15e</name>
+        <user_friendly_name>GGNFS Siever v15</user_friendly_name>
+    </app>
+    <app>
+        <name>gnfslasieve4I16e</name>
+        <user_friendly_name>GGNFS Siever v16</user_friendly_name>
+    </app>
+</boinc>

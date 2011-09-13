@@ -1,0 +1,156 @@
+<?xml version="1.0" ?>
+<boinc>
+  <config>
+    <homogeneous_redundancy>0</homogeneous_redundancy>
+    <multiple_clients_per_host>0</multiple_clients_per_host>
+    <one_result_per_user_per_wu>1</one_result_per_user_per_wu>
+    <upload_dir>/SCRATCH/boinc/upload</upload_dir>
+    <send_result_abort>1</send_result_abort>
+    <long_name>BOINC Sample Server</long_name>
+    <cgi_url>http://myfqdn.com/boinc_cgi/</cgi_url>
+    <sched_debug_level>3</sched_debug_level>
+    <disable_account_creation>1</disable_account_creation>
+    <uldl_dir_fanout>1024</uldl_dir_fanout>
+    <download_url>http://myfqdn.com/boinc/download</download_url>
+    <db_user>boincadmin</db_user>
+    <log_dir>/SCRATCH/boinc/log_hostname</log_dir>
+    <app_dir>/SCRATCH/boinc/apps</app_dir>
+    <download_dir>/SCRATCH/boinc/download</download_dir>
+    <fuh_debug_level>3</fuh_debug_level>
+    <master_url>http://myfqdn.com/boinc/</master_url>
+    <host>hostname</host>
+    <db_name>boinc</db_name>
+    <shmem_key>0x11116c2b</shmem_key>
+    <show_results>1</show_results>
+    <key_dir>/SCRATCH/boinc/</key_dir>
+    <upload_url>http://myfqdn.com/boinc_cgi/file_upload_handler</upload_url>
+    <db_passwd>db-password-here-secure!</db_passwd>
+    <min_sendwork_interval>6</min_sendwork_interval>
+    <db_host>localhost</db_host>
+    <daily_result_quota>500</daily_result_quota>
+    <one_result_per_user_per_wu>0</one_result_per_user_per_wu>
+    <max_wus_to_send>16</max_wus_to_send>
+  </config>
+  <tasks>
+    <task>
+      <cmd>db_dump -d 2 -dump_spec ../db_dump_spec.xml</cmd>
+      <period>24 hours</period>
+      <disabled>1</disabled>
+      <output>db_dump.out</output>
+    </task>
+    <task>
+      <cmd>run_in_ops ./update_uotd.php</cmd>
+      <period>1 days</period>
+      <disabled>1</disabled>
+      <output>update_uotd.out</output>
+    </task>
+    <task>
+      <cmd>run_in_ops ./update_forum_activities.php</cmd>
+      <period>1 hour</period>
+      <disabled>1</disabled>
+      <output>update_forum_activities.out</output>
+    </task>
+    <task>
+      <cmd>update_stats -update_users -update_teams -update_hosts</cmd>
+      <period>7 days</period>
+      <disabled>1</disabled>
+      <output>update_stats.out</output>
+    </task>
+    <task>
+      <cmd>run_in_ops ./update_profile_pages.php</cmd>
+      <period>24 hours</period>
+      <disabled>1</disabled>
+      <output>update_profile_pages.out</output>
+    </task>
+    <task>
+      <cmd>run_in_ops ./notify.php</cmd>
+      <period>24 hours</period>
+      <disabled>1</disabled>
+      <output>notify.out</output>
+    </task>
+  </tasks>
+  <daemons>
+    <daemon>
+      <cmd>feeder -d 1 </cmd>
+    </daemon>
+    <daemon>
+      <cmd>transitioner -d 1 </cmd>
+    </daemon>
+    <daemon>
+      <cmd>file_deleter -d 1</cmd>
+    </daemon>
+    <daemon>
+      <cmd>hashcat_validator -d 1 --app hashcat</cmd>
+    </daemon>
+    <daemon>
+      <cmd>hashcat-7zwordlist_validator -d 1 --app hashcat-7zwordlist</cmd>
+    </daemon>
+    <daemon>
+      <cmd>cudahashcat+_validator -d 1 --app cudahashcat+</cmd>
+    </daemon>
+    <daemon>
+      <cmd>cudahashcat+-7zwordlist_validator -d 1 --app cudahashcat+-7zwordlist</cmd>
+    </daemon>
+    <daemon>
+      <cmd>john_validator -d 1 --app john</cmd>
+    </daemon>
+    <daemon>
+      <cmd>msieve_validator -d 1 --app msieve</cmd>
+    </daemon>
+    <daemon>
+      <cmd>gnfs-lasieve4I11e_validator -d 1 --app gnfslasieve4I11e</cmd>
+    </daemon>
+    <daemon>
+      <cmd>gnfs-lasieve4I12e_validator -d 1 --app gnfslasieve4I12e</cmd>
+    </daemon>
+    <daemon>
+      <cmd>gnfs-lasieve4I13e_validator -d 1 --app gnfslasieve4I13e</cmd>
+    </daemon>
+    <daemon>
+      <cmd>gnfs-lasieve4I14e_validator -d 1 --app gnfslasieve4I14e</cmd>
+    </daemon>
+    <daemon>
+      <cmd>gnfs-lasieve4I15e_validator -d 1 --app gnfslasieve4I15e</cmd>
+    </daemon>
+    <daemon>
+      <cmd>gnfs-lasieve4I16e_validator -d 1 --app gnfslasieve4I16e</cmd>
+    </daemon>
+    <daemon>
+      <cmd>john_assimilator -d 1 --app john</cmd>
+    </daemon>
+    <daemon>
+      <cmd>cudahashcat+_assimilator -d 1 --app cudahashcat+</cmd>
+    </daemon>
+    <daemon>
+      <cmd>cudahashcat+-7zwordlist_assimilator -d 1 --app cudahashcat+-7zwordlist</cmd>
+    </daemon>
+    <daemon>
+      <cmd>hashcat_assimilator -d 1 --app hashcat</cmd>
+    </daemon>
+    <daemon>
+      <cmd>hashcat-7zwordlist_assimilator -d 1 --app hashcat-7zwordlist</cmd>
+    </daemon>
+    <daemon>
+      <cmd>msieve_assimilator -d 1 --app msieve</cmd>
+    </daemon>
+    <daemon>
+      <cmd>gnfs-lasieve4I11e_assimilator -d 1 --app gnfslasieve4I11e</cmd>
+    </daemon>
+    <daemon>
+      <cmd>gnfs-lasieve4I12e_assimilator -d 1 --app gnfslasieve4I12e</cmd>
+    </daemon>
+    <daemon>
+      <cmd>gnfs-lasieve4I13e_assimilator -d 1 --app gnfslasieve4I13e</cmd>
+    </daemon>
+    <daemon>
+      <cmd>gnfs-lasieve4I14e_assimilator -d 1 --app gnfslasieve4I14e</cmd>
+    </daemon>
+    <daemon>
+      <cmd>gnfs-lasieve4I15e_assimilator -d 1 --app gnfslasieve4I15e</cmd>
+    </daemon>
+    <daemon>
+      <cmd>gnfs-lasieve4I16e_assimilator -d 1 --app gnfslasieve4I16e</cmd>
+    </daemon>
+  </daemons>
+</boinc>
+

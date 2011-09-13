@@ -1,0 +1,152 @@
+These are the files off of my BOINC server, and show my layout for the 
+applications, templates, and the dashboard I added.
+
+Q: Why do you have such strange platforms?  Per-processor architectures?!
+   Do I need to do that?
+   
+A: No.  I did that in the very beginning when I thought GGNFS performed 
+wildly differently on different processor architectures.  I never changed it.
+But I'll explain how to do this anyway.
+
+1) define your platforms in project.xml
+2) Instead of _linux as your platform, put the custom platform you defined in
+   project.xml
+3) TODO
+   
+
+config.xml
+config_aux.xml
+	Configuration Files for the BOINC server, containing:
+	 - Additional assimilator and validator daemons for all the applications
+	 - Settings to ensure each client recieves only the number of workunits
+	   it can run at once.  Without these, a client will reserver a number of 
+	   workunits to work on 'later'.  We want to distribute all our work at 
+	   once, so this reservation system messes us up.
+	   config_aux does this for us.
+
+project.xml
+	The config file that defines my custom platforms, and all the applications 
+	I run.
+   
+apps/
+	releasegnfsversion.sh
+	releasejohn.sh
+	releasemsieveversion.sh
+	
+	These are simple bash scripts I wrote to copy an application to the 
+	appropriate folders.
+	
+	cudahashcat+/
+	cudahashcat+-7zwordlist/
+	gnfslasieve4I11e/
+	gnfslasieve4I12e/
+	gnfslasieve4I13e/
+	gnfslasieve4I14e/
+	gnfslasieve4I15e/
+	gnfslasieve4I16e/
+	hashcat/
+	hashcat-7zwordlist/
+	john/
+	msieve/
+	
+	These are the individual application folders.  The actual applications are 
+	not present, but merely stubs so you can see the naming.
+	
+	The "7zwordlist" versions indicate that the wordlist is actually a 
+	compressed file that must be compressed prior to running.  Some wordlists
+	I used were very large.
+	
+	\cudahashcat+
+		\cudahashcat+-wrapper_1.9_x64-xeon__cuda_fermi
+	
+	Here we see the application name "cudahashcat+-wrapper", the version 1.9,
+	the platform x64-xeon, and the App Plan __cuda_fermi
+	
+			7z
+			cudahashcat+-wrapper_1.9_x64-xeon__cuda_fermi
+			cudahashcat=cudahashcat_0.03_x64-linux
+			eula.accepted
+			kernels.7z
+			job.xml=job.xml-1.9-cudahashcat+
+
+	Here are the files for this particular version.
+	 - 7z is a version of 7z that will run on a x64 machine
+	 - cudahashcat+-wrapper_1.9_x64-xeon__cuda_fermi is the wrapper app.
+	   Not that it is the main program, and its name much match its parent 
+	   folder EXACTLY.
+	 - cudahashcat=cudahashcat_0.03_x64-linux has two parts: the logical name 
+	   'cudahashcat' and the physical name 'cudahashcat_0.03_x64-linux"
+	 - eula.accepted is a file needed by cudaHashcat
+	 - kernels.7z are files used by cudaHashcat and will be unzipped before 
+	   cudahashcat is run
+	 - job.xml=job.xml-1.9-cudahashcat+ also has two parts: the logical name
+	   job.xml (what it must be named for the wrapper app) and the physical name
+	   job.xml-1.9-cudahashcat+.  
+	   No two BOINC files can have the same name.  If I called it job.xml, I 
+	   could never name another file job.xml, nor could I edit this one.
+	   So I suggest you use this pattern for your job.xml files.
+	   Inside job.xml are two tasks: one to unzip kernels.7z to the appropriate 
+	   location, and the second to actually run cudahashcat+
+
+		
+		
+bin/
+	directory-contents.txt
+	
+	This file just shows how each application must have its own assimilator and
+	validator, and that you can symlink them to the samples provided.
+	
+html/
+	ops/
+		index.php.patch
+		status.php
+		
+	This is the custom dashboard I wrote to give me a refreshing, easily 
+	glance-able version of all outstanding workunits.
+	
+templates/
+	*_result.xml
+	
+	These are the output templates - what each application is expected to 
+	produce.  The options used in various ones are:
+	 - <generated_locally/> - Always present
+     - <upload_when_present/> - Always present
+	 - <gzip_when_done/> - gzips the file before uploading.  You will need to 
+				rename the file on the server to .gz and then gunzip
+	 - <open_name>output_data</open_name> - the logical name is output_data
+				and there is a corresponding 
+				boinc_resolve_filename("output_data") (unless copy_file is set)
+	 - <optional>0</optional> - this file is NOT optional. If it is not present, 
+				BOINC will treat the result as a failure.
+     - <no_validate>1</no_validate> - 1 if using sample_bitwise_validator
+	 - <copy_file /> - This file is written out by the application in a local 
+				directory and not opened with boinc_resolve_filename.  It should be 
+				copied from that directory.
+				See: 'Slot Directory', 'Legacy Applications'
+			
+	*_wu.xml
+	*_wu_wordlist.xml
+	*_wu_wordlist_rules.xml
+	
+	These are the input templates for the applications, what each application 
+	will need to run.  The options used in various ones are:
+	 - <ignore_download_checks/> - This is a custom property I patched BOINC to 
+				provide. If the file was modified on the server (or in transit),
+				BOINC should ignore that the file's integrity is changed.
+				See: TODO
+	 - <sticky /> - Indicates the file should remain on the _client_ after the 
+				workunit is finished.  Use if a file is used for multiple
+				workunits.
+	 - <no_delete/> - Indicates the file should remain on the _server_ after the 
+				workunit is completed.  Use if a file is used for multiple 
+				workunits.
+	 - <open_name>passwordlist</open_name> - Again, the logical name.  There 
+				should be a corresponding boinc_resolve_filename("passwordlist")
+	 - <copy_file /> - Indicates this file should be copied INTO the local 
+				directory (slot directory) used by the application
+				
+	
+	john.conf*
+	
+	Pieces of the john.conf file used by my script to generate a complete 
+	john.conf for distributing to clients.

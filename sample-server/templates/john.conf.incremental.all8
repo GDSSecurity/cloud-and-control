@@ -1,0 +1,5 @@
+[Incremental:All]
+File = $JOHN/all.chr
+MinLen = 0
+MaxLen = 8
+CharCount = 95

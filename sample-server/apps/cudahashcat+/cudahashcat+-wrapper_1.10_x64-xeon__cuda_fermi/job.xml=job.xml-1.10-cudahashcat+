@@ -1,0 +1,14 @@
+<job_desc>
+    <task>
+        <application>7z</application>
+	<command_line>-y -o$PROJECT_DIR x $PROJECT_DIR/kernels.7z</command_line>
+        <stdout_filename>7z-stdout</stdout_filename>
+        <stderr_filename>7z-stderr</stderr_filename>
+    </task>
+    <task>
+        <application>cudahashcat</application>
+	<command_line>--output-file=john.pot --output-format=0</command_line>
+        <stdout_filename>task-stdout</stdout_filename>
+        <stderr_filename>task-stderr</stderr_filename>
+    </task>
+</job_desc>

@@ -1,0 +1,56 @@
+<?xml version="1.0" ?>
+<config>
+  <max_jobs_in_progress>
+    <project>
+      <total_limit>
+        <jobs>16</jobs>
+      </total_limit>
+      <cpu_limit>
+        <jobs>1</jobs>
+        <per_proc />
+      </cpu_limit>
+    </project>
+    <app>
+      <app_name>hashcat</app_name>
+      <total_limit>
+        <jobs>16</jobs>
+      </total_limit>
+      <cpu_limit>
+        <jobs>1</jobs>
+      </cpu_limit>
+    </app>
+    <app>
+      <app_name>cudahashcat+</app_name>
+      <total_limit>
+        <jobs>16</jobs>
+      </total_limit>
+      <gpu_limit>
+        <jobs>1</jobs>
+      </gpu_limit>
+      <cpu_limit>
+        <jobs>1</jobs>
+      </cpu_limit>
+    </app>
+    <app>
+      <app_name>hashcat-7zwordlist</app_name>
+      <total_limit>
+        <jobs>16</jobs>
+      </total_limit>
+      <cpu_limit>
+        <jobs>1</jobs>
+      </cpu_limit>
+    </app>
+    <app>
+      <app_name>cudahashcat+-7zwordlist</app_name>
+      <total_limit>
+        <jobs>16</jobs>
+      </total_limit>
+      <gpu_limit>
+        <jobs>1</jobs>
+      </gpu_limit>
+      <cpu_limit>
+        <jobs>1</jobs>
+      </cpu_limit>
+    </app>
+  </max_jobs_in_progress>
+</config>

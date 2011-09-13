@@ -1,0 +1,5 @@
+[Incremental:Digits]
+File = $JOHN/digits.chr
+MinLen = 1
+MaxLen = 6
+CharCount = 10

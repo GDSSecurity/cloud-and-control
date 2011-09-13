@@ -1,0 +1,13 @@
+#
+# This file is part of John the Ripper password cracker,
+# Copyright (c) 1996-2006,2008-2010 by Solar Designer
+# It's been sliced up as part of a distribution script
+# and should not be relied on
+#
+
+[Options]
+Wordlist = $JOHN/password.lst
+Idle = N
+Save = 600
+Beep = N
+

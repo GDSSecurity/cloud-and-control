@@ -1,0 +1,46 @@
+<file_info>
+  <name><OUTFILE_0/></name>
+  <generated_locally/>
+  <upload_when_present/>
+  <max_nbytes>104857600</max_nbytes>
+  <url><UPLOAD_URL/></url>
+  <gzip_when_done/>
+</file_info>
+<file_info>
+  <name><OUTFILE_1/></name>
+  <generated_locally/>
+  <upload_when_present/>
+  <max_nbytes>104857600</max_nbytes>
+  <url><UPLOAD_URL/></url>
+  <gzip_when_done/>
+</file_info>
+<file_info>
+  <name><OUTFILE_2/></name>
+  <generated_locally/>
+  <upload_when_present/>
+  <max_nbytes>104857600</max_nbytes>
+  <url><UPLOAD_URL/></url>
+  <gzip_when_done/>
+</file_info>
+<result>
+  <file_ref>
+    <file_name><OUTFILE_0/></file_name>
+    <open_name>john.pot</open_name>
+    <optional>1</optional>
+    <no_validate>1</no_validate>
+    <copy_file />
+  </file_ref>
+  <file_ref>
+    <file_name><OUTFILE_1/></file_name>
+    <open_name>task-stdout</open_name>
+    <optional>1</optional>
+    <no_validate>1</no_validate>
+  </file_ref>
+  <file_ref>
+    <file_name><OUTFILE_2/></file_name>
+    <open_name>task-stderr</open_name>
+    <optional>1</optional>
+    <no_validate>1</no_validate>
+  </file_ref>
+</result>
+

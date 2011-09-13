@@ -1,0 +1,41 @@
+# Capitalize every pure alphanumeric word
+-c (?a >2 !?X c Q
+# Pluralize pure alphabetic words
+<* >2 !?A p
+# Duplicate reasonably short pure alphabetic words (fred -> fredfred)
+<7 >1 !?A l d
+# Lowercase and reverse pure alphabetic words
+>3 !?A l M r Q
+# Uppercase pure alphanumeric words
+-c >2 !?X u Q M c Q u
+# Lowercase pure alphabetic words and append a digit or simple punctuation
+<* >2 !?A l $[12!37954860.?]
+# Words containing punctuation, which is then squeezed out, lowercase
+/?p @?p >3 l
+# Words with vowels removed, lowercase
+/?v @?v >3 l
+# Words containing whitespace, which is then squeezed out, lowercase
+/?w @?w >3 l
+# Capitalize and duplicate short pure alphabetic words (fred -> FredFred)
+-c <7 >1 !?A c d
+# Capitalize and reverse pure alphabetic words (fred -> derF)
+-c <+ >2 !?A c r
+# Reverse and capitalize pure alphabetic words (fred -> Derf)
+-c >2 !?A l M r Q c
+# Uppercase the last letter of pure alphabetic words (fred -> freD)
+-c <+ >2 !?A l M r Q c r
+# Capitalize pure alphabetic words and append a digit or simple punctuation
+-c <* >2 !?A c $[12!3957468.?0]
+# Prefix pure alphabetic words with stuff
+>2 !?A l ^[0123479568.?!]
+# Capitalize and pluralize pure alphabetic words of reasonable length
+-c <* >2 !?A c p
+# Lowercase/capitalize pure alphabetic words of reasonable length and convert:
+# crack -> cracked, crack -> cracking
+-[:c] <* >2 !?A \p1[lc] M [PI] Q
+# Lowercase and reflect pure alphabetic words (fred -> fredderf)  
+<7 >1 !?A l d M 'l f Q
+# Try the second half of split passwords
+-s x**
+-s-c x** M l Q
+

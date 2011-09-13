@@ -1,0 +1,26 @@
+<file_info>
+  <number>0</number>
+  <sticky />
+  <no_delete/>
+  <ignore_download_checks />
+</file_info>
+<file_info>
+  <number>1</number>
+</file_info>
+<workunit>
+  <file_ref>
+    <file_number>0</file_number>
+    <open_name>passwordlist</open_name>
+    <copy_file />
+  </file_ref>
+  <file_ref>
+    <file_number>1</file_number>
+    <open_name>compressed-wordlist</open_name>
+  </file_ref>
+
+  <target_nresults>1</target_nresults>
+  <min_quorum>1</min_quorum>
+  <credit>1000</credit>
+  <delay_bound>43200</delay_bound>
+</workunit>
+

@@ -1,0 +1,16 @@
+<file_info>
+  <name><OUTFILE_0/></name>
+  <generated_locally/>
+  <upload_when_present/>
+  <max_nbytes>104857600</max_nbytes>
+  <url><UPLOAD_URL/></url>
+</file_info>
+<result>
+  <file_ref>
+    <file_name><OUTFILE_0/></file_name>
+    <open_name>output_data</open_name>
+    <optional>0</optional>
+    <no_validate>1</no_validate>
+  </file_ref>
+</result>
+

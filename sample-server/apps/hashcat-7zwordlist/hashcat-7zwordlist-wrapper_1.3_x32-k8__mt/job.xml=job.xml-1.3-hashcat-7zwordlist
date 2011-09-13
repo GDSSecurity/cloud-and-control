@@ -1,0 +1,15 @@
+<job_desc>
+    <task>
+    	<application>7z</application>
+	<command_line>-y -txz -si -so x</command_line>
+	<stdin_filename>compressed-wordlist</stdin_filename>
+	<stdout_filename>wordlist</stdout_filename>
+        <stderr_filename>7z-stderr</stderr_filename>
+    </task>
+    <task>
+        <application>hashcat-7zwordlist</application>
+	<command_line>--output-file=john.pot --output-format=0</command_line>
+        <stdout_filename>task-stdout</stdout_filename>
+        <stderr_filename>task-stderr</stderr_filename>
+    </task>
+</job_desc>
