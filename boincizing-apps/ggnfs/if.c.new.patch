@@ -1,0 +1,49 @@
+Index: src/if.c
+===================================================================
+--- src/if.c	(revision 400)
++++ src/if.c	(working copy)
+@@ -21,6 +21,18 @@
+ 
+ #include <time.h>
+ 
++#ifdef HAVE_BOINC
++	#include <stdarg.h>
++	#ifdef _WIN32
++		#include "boinc_win.h"
++		#include "boinc_api.h"
++		#include "filesys.h"
++	#else
++		#include <boinc/boinc_api.h>
++		#include <boinc/filesys.h>
++	#endif
++#endif
++
+ #if defined (__MINGW32__) || defined (MINGW32)
+ #include <io.h>
+ #elif defined(_MSC_VER)
+@@ -108,7 +120,11 @@
+   vfprintf(stderr, fmt, arglist);
+   if (logfile != NULL)
+     vfprintf(logfile, fmt, arglist);
+-  exit(1);
++#ifdef HAVE_BOINC
++    boinc_finish(1);
++#else
++     exit(1);
++#endif
+ }
+ 
+ /*****************************************************/
+@@ -120,7 +136,11 @@
+   vfprintf(stderr, fmt, arglist);
+   if (logfile != NULL)
+     vfprintf(logfile, fmt, arglist);
+-  abort();
++#ifdef HAVE_BOINC
++    boinc_finish(1);
++#else
++    abort();
++#endif
+ }
+ 
+ void numread(char *arg, unsigned *x)

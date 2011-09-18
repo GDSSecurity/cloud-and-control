@@ -1,0 +1,13 @@
+Index: src/lasieve4/ppc32/siever-config.h
+===================================================================
+--- src/lasieve4/ppc32/siever-config.h	(revision 400)
++++ src/lasieve4/ppc32/siever-config.h	(working copy)
+@@ -18,7 +18,7 @@
+ 
+ #include "ggnfs.h"
+ 
+-#define L1_BITS 15
++#define L1_BITS 16
+ /* L1_BITS 15 for Intel Core2 (32Kb L1 data cache) */
+ /* L1_BITS 16 for Phenom/Opteron... AMD K7 and up  */
+ /* L1_BITS 14 was here before. Pentium3-4 had 16Kb */

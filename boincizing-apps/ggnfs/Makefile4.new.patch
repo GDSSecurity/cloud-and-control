@@ -1,0 +1,47 @@
+Index: src/experimental/lasieve4_64/Makefile
+===================================================================
+--- src/experimental/lasieve4_64/Makefile	(revision 400)
++++ src/experimental/lasieve4_64/Makefile	(working copy)
+@@ -31,7 +31,10 @@
+ 
+ 
+ all : gnfs-lasieve4I11e gnfs-lasieve4I12e gnfs-lasieve4I13e \
+-      gnfs-lasieve4I14e gnfs-lasieve4I15e gnfs-lasieve4I16e
++      gnfs-lasieve4I14e gnfs-lasieve4I15e gnfs-lasieve4I16e \
++      gnfs-boinc-lasieve4I11e gnfs-boinc-lasieve4I12e \
++      gnfs-boinc-lasieve4I13e gnfs-boinc-lasieve4I14e \
++      gnfs-boinc-lasieve4I15e gnfs-boinc-lasieve4I16e \
+ 
+ 
+ %.o: %.c asm/siever-config.h
+@@ -64,8 +67,30 @@
+ gnfs-lasieve4I16e: gnfs-lasieve4eI16.o $(OBJS) libgmp-aux.a \
+                              liblasieve.a liblasieveI16.a 
+ 	$(CC) $(CFLAGS) $(INC) $(LIBFLAGS) -o $@ $^ $(LIBS) -static
++	
++gnfs-boinc-lasieve4eI%.o: gnfs-lasieve4e.c 
++	$(CC) $(CFLAGS) $(INC) -c -DI_bits=$* -DHAVE_BOINC -o $@ $<
+ 
++gnfs-boinc-lasieve4I11e: gnfs-boinc-lasieve4eI11.o $(OBJS) libgmp-aux.a \
++                             liblasieve.a liblasieveI11.a 
++	$(CC) $(CFLAGS) $(INC) $(LIBFLAGS) -o $@ $^ $(LIBS) -static -lboinc_api -lboinc -lstdc++ -lpthread -lm
++gnfs-boinc-lasieve4I12e: gnfs-boinc-lasieve4eI12.o $(OBJS) libgmp-aux.a \
++                             liblasieve.a liblasieveI12.a 
++	$(CC) $(CFLAGS) $(INC) $(LIBFLAGS) -o $@ $^ $(LIBS) -static -lboinc_api -lboinc -lstdc++ -lpthread -lm
++gnfs-boinc-lasieve4I13e: gnfs-boinc-lasieve4eI13.o $(OBJS) libgmp-aux.a \
++                             liblasieve.a liblasieveI13.a 
++	$(CC) $(CFLAGS) $(INC) $(LIBFLAGS) -o $@ $^ $(LIBS) -static -lboinc_api -lboinc -lstdc++ -lpthread -lm
++gnfs-boinc-lasieve4I14e: gnfs-boinc-lasieve4eI14.o $(OBJS) libgmp-aux.a \
++                             liblasieve.a liblasieveI14.a 
++	$(CC) $(CFLAGS) $(INC) $(LIBFLAGS) -o $@ $^ $(LIBS) -static -lboinc_api -lboinc -lstdc++ -lpthread -lm
++gnfs-boinc-lasieve4I15e: gnfs-boinc-lasieve4eI15.o $(OBJS) libgmp-aux.a \
++                             liblasieve.a liblasieveI15.a 
++	$(CC) $(CFLAGS) $(INC) $(LIBFLAGS) -o $@ $^ $(LIBS) -static -lboinc_api -lboinc -lstdc++ -lpthread -lm
++gnfs-boinc-lasieve4I16e: gnfs-boinc-lasieve4eI16.o $(OBJS) libgmp-aux.a \
++                             liblasieve.a liblasieveI16.a 
++	$(CC) $(CFLAGS) $(INC) $(LIBFLAGS) -o $@ $^ $(LIBS) -static -lboinc_api -lboinc -lstdc++ -lpthread -lm
+ 
++
+ clean:
+ ifeq ($(OS),Windows_NT)
+ 	-rm -f *.o *.a $(BINDIR)/gnfs-lasieve4I1?e.exe

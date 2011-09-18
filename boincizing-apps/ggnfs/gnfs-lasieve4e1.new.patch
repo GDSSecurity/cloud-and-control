@@ -1,0 +1,265 @@
+Index: src/lasieve4/gnfs-lasieve4e.c
+===================================================================
+--- src/lasieve4/gnfs-lasieve4e.c	(revision 414)
++++ src/lasieve4/gnfs-lasieve4e.c	(working copy)
+@@ -13,6 +13,29 @@
+   02111-1307, USA.
+ */
+ 
++#ifdef HAVE_BOINC
++	#include <stdarg.h>
++	#ifdef _WIN32
++		#include "boinc_win.h"
++		#include "boinc_api.h"
++		#include "filesys.h"
++	#else
++		#include <boinc/boinc_api.h>
++		#include <boinc/filesys.h>
++	#endif
++
++	void boincstop(int retcode);
++	int boincstart(int argc_init, char **argv);
++	void boincstatus(double percent);
++	int main_lasieve(int argc, char **argv);
++
++	static char path_in[500];
++	static char path_out[500];
++	#define exit(i) boincstop(i)
++	#define fopen(i,j) boinc_fopen(i,j)
++#endif
++
++
+ #include "lasieve.h"
+ 
+ #include <assert.h>
+@@ -635,6 +658,9 @@
+   u32_t   absa0, absa1, absb0, absb1;
+   char    a0s, a1s;
+   double  tStart, tNow, lastReport;
++#ifdef HAVE_BOINC
++  double  pct;
++#endif
+ 
+   initprime32(&special_q_ps);
+   last_clock = clock();
+@@ -2693,8 +2719,13 @@
+     tNow = sTime();
+     if (tNow > lastReport + 5.0) {
+       lastReport = sTime();
++#ifdef HAVE_BOINC
++      pct=((double)(special_q - first_spq))/((double)sieve_count);
++      boincstatus(pct);
++#else
+       fprintf(stderr, "\rtotal yield: %u, q=%u (%1.5lf sec/rel)", 
+     	    (unsigned int)yield, (unsigned int)special_q, (tNow - tStart)/yield);
++#endif
+       fflush(stderr);
+       { char *ofn;
+         FILE *of;
+@@ -2708,8 +2739,16 @@
+       }
+     }
+   }
++#ifdef HAVE_BOINC
++  //periodically callback into boinc to show we are alive
++  pct=((double)(special_q - first_spq))/((double)sieve_count);
++  boincstatus(pct);
++  fprintf(stderr, "\rtotal yield: %u, q=%u %1.5lf sec/rel, in %d seconds\n", 
++	  (unsigned int)yield, (unsigned int)special_q, (sTime() - tStart)/yield, (sTime() - tStart));
++#else
+   fprintf(stderr, "\rtotal yield: %u, q=%u (%1.5lf sec/rel)\n", 
+ 	(unsigned int)yield, (unsigned int)special_q, (sTime() - tStart)/yield);
++#endif
+   free(r_ptr);
+   return 0;
+ }
+@@ -2725,7 +2764,7 @@
+   sieve_min[0] = sieve_min[1]=0;
+ 
+   if (!(fp = fopen(fName, "rb"))) {
+-    printf("Error opening %s for read!\n", fName);
++    fprintf(stderr,"Error opening %s for read!\n", fName);
+     return -1;
+   }
+   input_poly(g_N, g_poly, g_poldeg, g_poly + 1, g_poldeg + 1, g_m, fp);
+@@ -2789,7 +2828,7 @@
+       } else if (strncmp(token, "lss:", 4)==0) {
+       } else if (strncmp(token, "deg:", 4)==0) {
+       } else {
+-        printf("Warning: Ignoring input line:\n%s\n", thisLine);
++        fprintf(stderr,"Warning: Ignoring input line:\n%s\n", thisLine);
+       }
+ #endif
+     }
+@@ -2824,12 +2863,12 @@
+     if(*p==':') {
+       if(i++ == side) tmp = p; /* we will only scan this section for a q0 */
+     } else if(!(*p=='-' || *p==',' || isspace(*p) || isxdigit(*p))) {
+-      if(first++ == 0) printf(" Warning! some corrupt lines in the original file\n");
++      if(first++ == 0) fprintf(stderr," Warning! some corrupt lines in the original file\n");
+       return -1;
+     }
+   }
+   if(i!=2) {
+-    printf(" Warning: an incomplete line in the original file; if just a few, it's ok, they will be skipped\n");
++    fprintf(stderr," Warning: an incomplete line in the original file; if just a few, it's ok, they will be skipped\n");
+     return -1;           /* must have two ':' some ',' and hexdigits */
+   }
+   
+@@ -2853,7 +2892,33 @@
+ }  
+ 
+ /**************************************************/
++#ifdef HAVE_BOINC
++/* this main talks with BOINC */
++//you must ensure this is enough
++#define ARGVCOUNT 12
++
+ int main(int argc, char **argv)
++{
++	int app_argc;
++	char* app_argv[ARGVCOUNT];
++	int retcode;
++	app_argv[0] = argv[0];
++	app_argc= boincstart(1,app_argv);
++	if(argc < 0) {
++	  retcode = 1;
++	} else {
++	  retcode= main_lasieve(app_argc,app_argv);
++	}
++	boincstatus(1.0);
++	boincstop(retcode);
++	return retcode;
++}
++
++
++int main_lasieve(int argc, char **argv)
++#else
++int main(int argc, char **argv)
++#endif
+ /**************************************************/
+ { u16_t zip_output, force_aFBcalc;
+   u16_t catch_signals;
+@@ -2976,6 +3041,8 @@
+       }
+     }
+ 
++    printf(stderr, "gnfs-lasieve4I%de: L1_BITS=%d, SVN $Revision$\n", I_bits, L1_BITS);
++
+     if(verbose) { /* first rudimentary test of automatic $Rev reporting */
+       fprintf(stderr, "gnfs-lasieve4I%de: L1_BITS=%d, SVN $Revision$\n", I_bits, L1_BITS);
+     }
+@@ -2998,7 +3065,7 @@
+ 	ret = parse_q_from_line(buf);
+       }
+       if(ret < 0) fprintf(g_ofile, "\n"); /* encapsulating the last incomplete line */
+-      printf(" Resuming with -f %d -c %d\n", first_spq, sieve_count);
++      fprintf(stderr," Resuming with -f %d -c %d\n", first_spq, sieve_count);
+     }
+ 
+     if (J_bits == UINT_MAX)
+@@ -3053,7 +3120,7 @@
+ 
+       if (FB_bound[special_q_side] > first_spq) {
+ 	FB_bound[special_q_side] = (float) first_spq-1;
+-	printf(" Warning:  lowering FB_bound to %u.\n",first_spq-1);
++	fprintf(stderr," Warning:  lowering FB_bound to %u.\n",first_spq-1);
+         /* complain("Special q lower bound %u below FB bound %g\n", 
+ 	   first_spq, FB_bound[special_q_side]); */
+       }
+@@ -3848,3 +3915,95 @@
+   fclose(ofile);
+   free(ofn);
+ } 
++
++
++#ifdef HAVE_BOINC
++
++void fail(const char *str,...)
++{
++  va_list ap;
++  va_start(ap,str);
++  vfprintf(stderr,str,ap);
++  va_end(ap);
++  fprintf(stderr,"\n");
++  fflush(stderr);
++  boinc_finish(1);
++}
++
++int boincstart(int argc_init, char **argv)
++{
++  int status,i;
++  status = boinc_init();
++  if(status) {
++    fail("boinc_init() failed: %d",status);
++    return -1;
++  }
++  fprintf(stderr, "boinc initialized\n");
++  
++  status = boinc_resolve_filename("input_data", path_in,  sizeof(path_in)  );
++  if(status) {
++    fail("cannot resolve workunit file name");
++  }
++  else {
++    fprintf(stderr, "resolved input_data file to %s\n", path_in);
++  }
++  
++  status = boinc_resolve_filename("output_data", path_out, sizeof(path_out) );
++  if(status) {
++    fail("cannot resolve result file name");
++  }
++  else {
++    fprintf(stderr, "resolved output_data file to %s\n", path_out);
++  }
++  
++  fprintf(stderr, "work files resolved, now working\n");
++  
++  //construct arg list
++  argv[argc_init++]="-R";
++  argv[argc_init++]="-a";
++  argv[argc_init++]="-o";
++  argv[argc_init++]=path_out;
++  argv[argc_init++]=path_in; 
++  
++  for(i=0;i<argc_init;i++) {
++    fprintf(stderr,"-> %s\n",argv[i]);
++  }
++  
++  return argc_init;
++}
++
++void boincstop(int retcode)
++{
++  char command[1000];
++  memset(command, 0, 1000);
++  strcpy(command, "gzip ");
++  strncat(command, path_out, 1000 - strlen(command));
++  system(command);
++
++  memset(command, 0, 1000);
++  strcpy(command, "mv ");
++  strncat(command, path_out, 1000 - strlen(command));
++  strncat(command, ".gz ", 1000 - strlen(command));
++  strncat(command, path_out, 1000 - strlen(command));
++  system(command);
++
++  boinc_finish(retcode);
++}
++
++void boincstatus(double percent)
++{
++  if (percent < 1.0) boinc_fraction_done(percent);
++  
++#ifdef _WIN32
++  Sleep(1);
++#else
++  sleep(1);
++#endif
++  
++  if(boinc_time_to_checkpoint()) {
++    fflush(g_ofile);
++    boinc_checkpoint_completed();
++  }
++}
++
++#endif

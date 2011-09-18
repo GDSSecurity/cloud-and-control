@@ -1,0 +1,13 @@
+Index: src/Makefile
+===================================================================
+--- src/Makefile	(revision 400)
++++ src/Makefile	(working copy)
+@@ -137,7 +137,7 @@
+ ifeq ($(OS),Windows_NT)
+ 	strip $(BINDIR)/*.exe
+ else
+-	strip $(BINS) ../bin/gnfs-lasieve4I1?e ../bin/pol51*
++	strip $(BINS) ../bin/gnfs-lasieve4I1?e ../bin/gnfs-boinc-lasieve4I1?e ../bin/pol51*
+ endif
+ 
+ clean : lasieve-clean polsel-clean

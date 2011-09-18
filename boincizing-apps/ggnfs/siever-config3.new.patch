@@ -1,0 +1,13 @@
+Index: src/lasieve4/generic/siever-config32.w
+===================================================================
+--- src/lasieve4/generic/siever-config32.w	(revision 400)
++++ src/lasieve4/generic/siever-config32.w	(working copy)
+@@ -10,7 +10,7 @@
+ 02111-1307, USA.
+ 
+ @(siever-config.h@>=
+-#define L1_BITS 14
++#define L1_BITS 16
+ #define ULONG_RI
+ 
+ #define PREINVERT
