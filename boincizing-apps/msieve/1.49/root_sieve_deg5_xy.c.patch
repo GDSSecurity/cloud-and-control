@@ -1,0 +1,15 @@
+Index: gnfs/poly/stage2/root_sieve_deg5_xy.c
+===================================================================
+--- gnfs/poly/stage2/root_sieve_deg5_xy.c	(revision 639)
++++ gnfs/poly/stage2/root_sieve_deg5_xy.c	(working copy)
+@@ -287,8 +287,8 @@
+ 	}
+ 	xy->y_blocks = y_blocks;
+ 
+-	printf("\n%.0lf %u %u\n", (double)lattice_size, 
+-			y_blocks, num_lattices);
++	//printf("\n%.0lf %u %u\n", (double)lattice_size, 
++	//		y_blocks, num_lattices);
+ 
+ 	sieve_x_run_deg5(rs);
+ }

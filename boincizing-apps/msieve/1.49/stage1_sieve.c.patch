@@ -1,0 +1,15 @@
+Index: gnfs/poly/stage1/stage1_sieve.c
+===================================================================
+--- gnfs/poly/stage1/stage1_sieve.c	(revision 639)
++++ gnfs/poly/stage1/stage1_sieve.c	(working copy)
+@@ -98,8 +98,8 @@
+ 	mpz_submul(poly->m0, poly->tmp2, poly->p);
+ 	mpz_tdiv_q(poly->m0, poly->m0, poly->tmp1);
+ 
+-	gmp_printf("poly %Zd %Zd %Zd\n",
+-			poly->high_coeff, poly->p, poly->m0);
++	//gmp_printf("poly %Zd %Zd %Zd\n",
++	//		poly->high_coeff, poly->p, poly->m0);
+ 
+ 	poly->callback(poly->high_coeff, poly->p, poly->m0,
+ 			poly->coeff_max, poly->callback_data);
