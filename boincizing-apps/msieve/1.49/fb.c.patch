@@ -1,0 +1,13 @@
+Index: gnfs/fb.c
+===================================================================
+--- gnfs/fb.c	(revision 639)
++++ gnfs/fb.c	(working copy)
+@@ -330,7 +330,7 @@
+ 	FILE *fp;
+ 	fb_side_t *side;
+ 
+-	write_poly(obj, n, &fb->rfb.poly, &fb->afb.poly, params->skewness);
++	write_poly(obj, n, &fb->rfb.poly, &fb->afb.poly, params->skewness, -1);
+ 
+ 	fp = fopen(obj->nfs_fbfile_name, "a");
+ 	if (fp == NULL) {

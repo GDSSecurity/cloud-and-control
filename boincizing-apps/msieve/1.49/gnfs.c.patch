@@ -1,0 +1,17 @@
+Index: gnfs/gnfs.c
+===================================================================
+--- gnfs/gnfs.c	(revision 639)
++++ gnfs/gnfs.c	(working copy)
+@@ -76,6 +76,12 @@
+ 					&alg_poly, &params.skewness);
+ 	}
+ 	if (status != 0) {
++	  	if(obj->boinc && status == -2) {
++	  		FILE* fp = fopen(obj->nfs_fbfile_name, "w");
++			fprintf(fp, "No polynomial parameters found from %llu - %llu\n",
++				obj->nfs_lower, obj->nfs_upper);
++			fclose(fp);
++		}
+ 		printf("error generating or reading NFS polynomials\n");
+ 		return 0;
+ 	}

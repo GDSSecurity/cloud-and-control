@@ -1,0 +1,47 @@
+Index: common/driver.c
+===================================================================
+--- common/driver.c	(revision 639)
++++ common/driver.c	(working copy)
+@@ -23,7 +23,7 @@
+ 			    enum cpu_type cpu,
+ 			    uint32 cache_size1, uint32 cache_size2,
+ 			    uint32 num_threads, uint32 mem_mb,
+-			    uint32 which_gpu, double target_density) {
++			    uint32 which_gpu, double target_density, char boinc) {
+ 
+ 	msieve_obj *obj = (msieve_obj *)xcalloc((size_t)1, sizeof(msieve_obj));
+ 
+@@ -40,6 +40,7 @@
+ 	obj->num_threads = num_threads;
+ 	obj->mem_mb = mem_mb;
+ 	obj->which_gpu = which_gpu;
++	obj->boinc = boinc;
+ 	obj->target_density = target_density;
+ 	obj->logfile_name = MSIEVE_DEFAULT_LOGFILE;
+ 	if (logfile_name)
+@@ -334,23 +335,15 @@
+ 		char namebuf[256];
+ 		sprintf(namebuf, "%s.mpi%02u", 
+ 				obj->logfile_name, obj->mpi_rank);
+-		FILE *logfile = fopen(namebuf, "a");
+-#else
+-		FILE *logfile = fopen(obj->logfile_name, "a");
+ #endif
+ 
+-		if (logfile == NULL) {
+-			fprintf(stderr, "cannot open logfile\n");
+-			exit(-1);
+-		}
+ 
+ 		va_start(ap, fmt);
+ 		buf[0] = 0;
+ 		strcpy(buf, ctime(&t));
+ 		*(strchr(buf, '\n')) = 0;
+-		fprintf(logfile, "%s  ", buf);
+-		vfprintf(logfile, fmt, ap);
+-		fclose(logfile);
++		fprintf(stderr, "%s  ", buf);
++		vfprintf(stderr, fmt, ap);
+ 		va_end(ap);
+ 	}
+ 	if (obj->flags & MSIEVE_FLAG_LOG_TO_STDOUT) {

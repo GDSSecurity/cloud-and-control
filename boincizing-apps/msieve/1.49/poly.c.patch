@@ -1,0 +1,41 @@
+Index: gnfs/poly/poly.c
+===================================================================
+--- gnfs/poly/poly.c	(revision 639)
++++ gnfs/poly/poly.c	(working copy)
+@@ -57,7 +57,7 @@
+ 
+ 	fp = fopen(obj->nfs_fbfile_name, "r");
+ 	if (fp == NULL)
+-		return -1;
++		return -2;
+ 	
+ 	buf[0] = 0;
+ 	fgets(buf, (int)sizeof(buf), fp);
+@@ -197,7 +197,8 @@
+ void write_poly(msieve_obj *obj, mp_t *n,
+ 	       mp_poly_t *rat_poly,
+ 	       mp_poly_t *alg_poly,
+-	       double skewness) {
++	       double skewness,
++	       double murphy) {
+ 	
+ 	/* log a generated polynomial to the factor base file */
+ 
+@@ -227,6 +228,7 @@
+ 			mp_sprintf(&alg_poly->coeff[i].num, 10,
+ 						obj->mp_sprintf_buf));
+ 	}
++	fprintf(fp, "#Murphy %.3le\n", murphy);
+ 	fclose(fp);
+ }
+ 
+@@ -282,7 +284,8 @@
+ 	if (config.heap[0]->rpoly.degree > 0) {
+ 		write_poly(obj, n, &config.heap[0]->rpoly,
+ 				&config.heap[0]->apoly,
+-				config.heap[0]->skewness);
++				config.heap[0]->skewness,
++				config.heap[0]->combined_score);
+ 	}
+ 	poly_config_free(&config);
+ 

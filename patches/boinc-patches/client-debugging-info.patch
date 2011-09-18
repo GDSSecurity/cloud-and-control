@@ -1,0 +1,97 @@
+Index: client/http_curl.cpp
+===================================================================
+--- client/http_curl.cpp        (revision 24231)
++++ client/http_curl.cpp        (working copy)
+@@ -972,6 +972,10 @@
+             } else {
+                 sprintf(error_msg, "HTTP error %ld", response);
+             }
++        msg_printf(NULL, MSG_INFO,
++                      "[http] HTTP error: %s %li (=%i?)", error_msg, response, HTTP_STATUS_NOT_FOUND
++                      );
++
+             switch (response) {
+             case HTTP_STATUS_NOT_FOUND:
+                 http_op_retval = ERR_FILE_NOT_FOUND;
+Index: lib/hostinfo.cpp
+===================================================================
+--- lib/hostinfo.cpp	(revision 22824)
++++ lib/hostinfo.cpp	(working copy)
+@@ -77,6 +77,7 @@
+             // fix foolishness that could result in negative value here
+             //
+             if (p_fpops < 0) p_fpops = -p_fpops;
++	    printf("[>] Just set flops to %.2f in spot 5\n", p_fpops);
+             continue;
+         }
+         else if (parse_double(buf, "<p_iops>", p_iops)) {
+Index: client/app_control.cpp
+===================================================================
+--- client/app_control.cpp	(revision 22824)
++++ client/app_control.cpp	(working copy)
+@@ -624,11 +624,13 @@
+         if (atp->task_state() != PROCESS_EXECUTING) continue;
+ 		if (!atp->result->project->non_cpu_intensive && (atp->elapsed_time > atp->max_elapsed_time)) {
+ 			msg_printf(atp->result->project, MSG_INFO,
+-				"Aborting task %s: exceeded elapsed time limit %.2f (%.2fG/%.2fG)",
+-				atp->result->name, atp->max_elapsed_time,
+-                atp->result->wup->rsc_fpops_bound/1e9,
+-                atp->result->avp->flops/1e9
+-			);
++				   "Aborting task %s: exceeded elapsed time limit %.2f > %.2f (%.2fG/%.2fG)",
++				   atp->result->name, 
++				   atp->elapsed_time,
++				   atp->max_elapsed_time,
++				   atp->result->wup->rsc_fpops_bound/1e9,
++				   atp->result->avp->flops/1e9
++				   );
+ 			atp->abort_task(ERR_RSC_LIMIT_EXCEEDED, "Maximum elapsed time exceeded");
+ 			did_anything = true;
+ 			continue;
+Index: client/client_state.cpp
+===================================================================
+--- client/client_state.cpp	(revision 22824)
++++ client/client_state.cpp	(working copy)
+@@ -318,6 +318,7 @@
+                 avp->avg_ncpus = 1;
+             }
+             avp->flops = avp->avg_ncpus * host_info.p_fpops;
++            msg_printf(NULL, MSG_INFO, "[>] Just set flops to %f = %.2f * %.2f in spot 1\n", avp->flops, avp->avg_ncpus, host_info.p_fpops);
+ 
+             // for GPU apps, use conservative estimate:
+             // assume app will run at peak CPU speed, not peak GPU
+Index: client/cs_scheduler.cpp
+===================================================================
+--- client/cs_scheduler.cpp	(revision 22824)
++++ client/cs_scheduler.cpp	(working copy)
+@@ -772,6 +772,7 @@
+             avp->avg_ncpus = avpp.avg_ncpus;
+             avp->max_ncpus = avpp.max_ncpus;
+             avp->flops = avpp.flops;
++            msg_printf(project, MSG_INFO, "[>] Just set flops to %.2f in spot 2\n", avp->flops);
+             strcpy(avp->cmdline, avpp.cmdline);
+             avp->ncudas = avpp.ncudas;
+             avp->natis = avpp.natis;
+Index: client/sim_util.cpp
+===================================================================
+--- client/sim_util.cpp	(revision 22824)
++++ client/sim_util.cpp	(working copy)
+@@ -485,6 +485,7 @@
+             avp->app = sap;
+             avp->avg_ncpus = 1;
+             avp->flops = gstate.host_info.p_fpops;
++	    msg_printf(NULL, MSG_INFO, "[>] Just set flops to %.2f in spot 3\n", avp->flops);
+             gstate.app_versions.push_back(avp);
+ 
+         } else if (!strcmp(tag, "available")) {
+Index: client/client_types.cpp
+===================================================================
+--- client/client_types.cpp	(revision 22824)
++++ client/client_types.cpp	(working copy)
+@@ -1161,6 +1163,7 @@
+             );
+         }
+     }
++    msg_printf(0, MSG_INFO, "[>] Just set flops to %.2f in spot 4\n", flops);
+     return ERR_XML_PARSE;
+ }

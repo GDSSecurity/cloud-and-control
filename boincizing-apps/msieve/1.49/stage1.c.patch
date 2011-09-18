@@ -1,0 +1,17 @@
+Index: gnfs/poly/stage1/stage1.c
+===================================================================
+--- gnfs/poly/stage1/stage1.c	(revision 639)
++++ gnfs/poly/stage1/stage1.c	(working copy)
+@@ -226,9 +226,9 @@
+ 		uint32 piece = get_rand(&obj->seed1,
+ 					&obj->seed2) % num_pieces;
+ 
+-		printf("randomizing rational coefficient: "
+-			"using piece #%u of %u\n",
+-			piece + 1, num_pieces);
++		//printf("randomizing rational coefficient: "
++		//	"using piece #%u of %u\n",
++		//	piece + 1, num_pieces);
+ 
+ 		special_q_min *= pow(piece_ratio, (double)piece);
+ 		special_q_max = special_q_min * piece_ratio;

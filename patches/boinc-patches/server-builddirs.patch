@@ -1,0 +1,165 @@
+Index: py/Boinc/tools.py
+===================================================================
+--- py/Boinc/tools.py	(revision 22824)
++++ py/Boinc/tools.py	(working copy)
+@@ -55,12 +55,12 @@
+ 
+ def get_kludge_open_name(filename):
+     """return part before '=' (or entire filename if none)"""
+-    assert ('/' not in filename)
++    #assert ('/' not in filename)
+     return filename.split('=')[0]
+ 
+ def get_kludge_url_filename(filename):
+     """return part after '=' (or entire filename if none)"""
+-    assert ('/' not in filename)
++    #assert ('/' not in filename)
+     if '=' in filename:
+         return filename.split('=',1)[1]
+     else:
+@@ -100,13 +100,13 @@
+         if not os.path.exists(sign_executable_path):
+             print os.getcwd()
+             raise SystemExit("sign_executable not found! did you `make' it?")
+-    signature_text = os.popen('%s %s %s'%(sign_executable_path,
++    signature_text = os.popen('%s "%s" "%s"'%(sign_executable_path,
+         executable_path,code_sign_key)).read()
+     if not signature_text:
+         raise SystemExit("Couldn't sign executable %s"%executable_path)
+     return signature_text
+ 
+-def process_app_file(file, signature_text=None, quiet=False, executable=True):
++def process_app_file(file, containing_dir, signature_text=None, quiet=False, executable=True):
+     '''Handle a new file to be added to the app version.
+ 
+     0. target filename is url_filename as described in process_app_version
+@@ -118,13 +118,23 @@
+ 
+     config = configxml.default_config()
+ 
+-    source_dir, source_file_base = os.path.split(file)
+-    target_file_base = get_kludge_url_filename(source_file_base)
++    source_file = file.replace(containing_dir + "/", '')
++    #print "source_file: %s"%source_file
++    directories_to_make, source_file_base = os.path.split(source_file)
++    #print "dirstomake: %s"%directories_to_make
++    #print "sfb: %s"%source_file_base
++    target_file_base = get_kludge_url_filename(source_file)
++    #print "tfb: %s"%target_file_base
+     target_path = os.path.join(config.config.download_dir, target_file_base)
++    #print "tp: %s"%target_path
++    target_dir = os.path.join(config.config.download_dir, directories_to_make)
++    #print "td: %s"%target_dir
+     target_url = os.path.join(config.config.download_url, target_file_base)
++    #print "tu: %s"%target_url
+     if not quiet:
+         print "Copying %s to %s"%(source_file_base, target_path)
+     if check_immutable(file, target_path):
++        os.popen('mkdir -p "%s"'%target_dir)
+         shutil.copy(file, target_path)
+ 
+     xml = '''<file_info>
+@@ -145,7 +155,7 @@
+     return xml
+ 
+ def process_app_version(
+-    app, version_num, exec_files,
++    app, version_num, exec_files, containing_dir,
+     non_exec_files=[],
+     signature_files={},
+     file_ref_infos={},
+@@ -192,7 +202,7 @@
+             signature_text = open(signature_file).read()
+         else:
+             signature_text = sign_executable(exec_file, quiet=quiet)
+-        xml_doc += process_app_file(exec_file, signature_text, quiet=quiet)
++        xml_doc += process_app_file(exec_file, containing_dir, signature_text, quiet=quiet)
+ 
+     for non_exec_file in non_exec_files:
+         signature_file = signature_files.get(non_exec_file)
+@@ -202,7 +212,7 @@
+         else:
+             signature_text = sign_executable(non_exec_file, quiet=quiet)
+         xml_doc += process_app_file(
+-            non_exec_file, signature_text=signature_text,
++            non_exec_file, containing_dir, signature_text=signature_text,
+             executable=False, quiet=quiet)
+ 
+     xml_doc += ('<app_version>\n'+
+@@ -217,9 +227,9 @@
+ 
+     first = True
+     for exec_file in exec_files + non_exec_files:
+-        file_base = os.path.basename(exec_file)
+-        open_name = get_kludge_open_name(file_base)
+-        url_filename = get_kludge_url_filename(file_base)
++        relativefile = exec_file.replace(containing_dir + "/", "")
++        open_name = get_kludge_open_name(relativefile)
++        url_filename = get_kludge_url_filename(relativefile)
+         xml_doc += '    <file_ref>\n'
+         xml_doc += '       <file_name>%s</file_name>\n' % url_filename
+         if first:
+Index: tools/update_versions
+===================================================================
+--- tools/update_versions	(revision 22824)
++++ tools/update_versions	(working copy)
+@@ -77,6 +77,7 @@
+     match,              # the output of re_match_exec_filename(exec_files[0])
+     exec_files,         # executable files; entry 0 is the main program
+     non_exec_files=[],  # non-executable files
++    containing_dir = '',# directory containing the file or files. parent of a single file, root of multiple files
+     signature_files={},
+     file_ref_infos = {},
+     extra_xml = ''
+@@ -116,6 +117,7 @@
+         version_num = version_num,
+         exec_files = exec_files,
+         non_exec_files = non_exec_files,
++        containing_dir = containing_dir,
+         signature_files = signature_files,
+         file_ref_infos = file_ref_infos,
+         api_version = api_version,
+@@ -181,10 +183,12 @@
+         signature_files[filepath] = sig_file
+     exec_files.insert(0, filepath)
+ 
++    containing_dir, throwaway = os.path.split(filepath)
+     add_files(
+         app             = app,
+         match           = match,
+         exec_files      = exec_files,
++        containing_dir  = containing_dir,
+         signature_files = signature_files,
+         )
+ 
+@@ -198,6 +202,14 @@
+ 
+ # Process a multi-file app version
+ # 
++def find_versions__process_bundle_subdir(subdir):
++    non_exec_files = []
++    for filepath in xlistdir(subdir):
++        if os.path.isdir(filepath):
++            non_exec_files.extend(find_versions__process_bundle_subdir(filepath))
++        else:
++            non_exec_files.append(filepath)
++    return non_exec_files
+ def find_versions__process_bundle(app, match, dir):
+     '''add executable + bundle as app version'''
+     exec_files = []
+@@ -209,6 +221,7 @@
+     found_main = False
+     for filepath in xlistdir(dir):
+         if os.path.isdir(filepath):
++            non_exec_files.extend(find_versions__process_bundle_subdir(filepath))
+             continue
+         if os.path.basename(filepath) == dirname:
+             # the filename matches the folder name,
+@@ -250,6 +263,7 @@
+         match            = match,
+         exec_files       = exec_files,
+         non_exec_files   = non_exec_files,
++        containing_dir	 = dir,
+         signature_files  = signature_files,
+         file_ref_infos   = file_ref_infos,
+         extra_xml        = extra_xml,

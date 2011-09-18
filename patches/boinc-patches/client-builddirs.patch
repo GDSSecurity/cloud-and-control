@@ -1,0 +1,104 @@
+Index: client/app_start.cpp
+===================================================================
+--- client/app_start.cpp	(revision 22824)
++++ client/app_start.cpp	(working copy)
+@@ -46,6 +46,7 @@
+ #include <unistd.h>
+ #include <cerrno>
+ #include <sys/stat.h>
++#include <libgen.h>
+ #include <string>
+ #endif
+ 
+@@ -312,6 +313,23 @@
+         return 0;
+     }
+ 
++    //Hacky code to build directories
++    vector<string> prevParents;
++    char outfile_copy[512];
++    strncpy(outfile_copy, link_path, 512);
++    char* parent = dirname(outfile_copy);
++    while(0 > mkdir(parent, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) && errno == ENOENT)
++      {
++	msg_printf(NULL, MSG_INTERNAL_ERROR, "directory %s didn't exist, adding it to be made", parent);
++	prevParents.push_back(parent);//implicit constructor
++	parent = dirname(parent);
++      }
++    for(int i=prevParents.size()-1; i>=0; i--)
++      {
++	int j = mkdir(prevParents[i].c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
++	msg_printf(NULL, MSG_INTERNAL_ERROR, "creating directory %s result: %i error: %i", prevParents[i].c_str(), j, errno);
++      }
++
+ #ifdef _WIN32
+     retval = make_soft_link(project, link_path, rel_file_path);
+     if (retval) return retval;
+Index: client/http_curl.cpp
+===================================================================
+--- client/http_curl.cpp	(revision 22824)
++++ client/http_curl.cpp	(working copy)
+@@ -29,6 +29,7 @@
+ #include <sstream>
+ #include <algorithm>
+ #include <sys/stat.h>
++#include <libgen.h>
+ #include <cerrno>
+ #include <unistd.h>
+ #ifdef HAVE_SYS_SOCKET_H
+@@ -384,6 +385,31 @@
+     return false;
+ }
+ 
++char *
++str_replace ( const char *string, const char *substr, const char *replacement ){
++  char *tok = NULL;
++  char *newstr = NULL;
++  char *oldstr = NULL;
++  /* if either substr or replacement is NULL, duplicate string a let caller handle it */
++  if ( substr == NULL || replacement == NULL ) return strdup (string);
++  newstr = strdup (string);
++  while ( (tok = strstr ( newstr, substr ))){
++    oldstr = newstr;
++    newstr = (char*)malloc ( strlen ( oldstr ) - strlen ( substr ) + strlen ( replacement ) + 1 );
++    /*failed to alloc mem, free old string and return NULL */
++    if ( newstr == NULL ){
++      free (oldstr);
++      return NULL;
++    }
++    memcpy ( newstr, oldstr, tok - oldstr );
++    memcpy ( newstr + (tok - oldstr), replacement, strlen ( replacement ) );
++    memcpy ( newstr + (tok - oldstr) + strlen( replacement ), tok + strlen ( substr ), strlen ( oldstr ) - strlen ( substr ) - ( tok - oldstr ) );
++    memset ( newstr + strlen ( oldstr ) - strlen ( substr ) + strlen ( replacement ) , 0, 1 );
++    free (oldstr);
++  }
++  return newstr;
++}
++
+ // the following will do an HTTP GET or POST using libcurl
+ //
+ int HTTP_OP::libcurl_exec(
+@@ -568,6 +599,23 @@
+     // set up an output file for the reply
+     //
+     if (strlen(outfile)) {
++         //Hacky code to build directories
++         vector<string> prevParents;
++         char outfile_copy[512];
++         strncpy(outfile_copy, outfile, 512);
++         char* parent = dirname(outfile_copy);
++         while(0 > mkdir(parent, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) && errno == ENOENT)
++           {
++             msg_printf(NULL, MSG_INTERNAL_ERROR, "directory %s didn't exist, adding it to be made", parent);
++             prevParents.push_back(parent);//implicit constructor
++             parent = dirname(parent);
++           }
++         for(int i=prevParents.size()-1; i>=0; i--)
++           {
++             int j = mkdir(prevParents[i].c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
++             msg_printf(NULL, MSG_INTERNAL_ERROR, "creating directory %s result: %i error: %i", prevParents[i].c_str(), j, errno);
++           }
++
+         if (file_offset>0.0) {
+             fileOut = boinc_fopen(outfile, "ab+");
+         } else {

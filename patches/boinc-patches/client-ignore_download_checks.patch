@@ -1,0 +1,46 @@
+Index: client/client_types.cpp
+===================================================================
+--- client/client_types.cpp	(revision 22824)
++++ client/client_types.cpp	(working copy)
+@@ -663,6 +663,7 @@
+     uploaded = false;
+     upload_when_present = false;
+     sticky = false;
++    ignoreDLCheck = false;
+     marked_for_delete = false;
+     report_on_rpc = false;
+     gzip_when_done = false;
+@@ -813,6 +814,7 @@
+         if (parse_bool(buf, "uploaded", uploaded)) continue;
+         if (parse_bool(buf, "upload_when_present", upload_when_present)) continue;
+         if (parse_bool(buf, "sticky", sticky)) continue;
++        if (parse_bool(buf, "ignore_download_checks", ignoreDLCheck)) continue;
+         if (parse_bool(buf, "marked_for_delete", marked_for_delete)) continue;
+         if (parse_bool(buf, "report_on_rpc", report_on_rpc)) continue;
+         if (parse_bool(buf, "gzip_when_done", gzip_when_done)) continue;
+Index: client/cs_files.cpp
+===================================================================
+--- client/cs_files.cpp	(revision 22824)
++++ client/cs_files.cpp	(working copy)
+@@ -150,6 +150,9 @@
+         return 0;
+     }
+ 
++    if(ignoreDLCheck)
++      return 0;
++
+     if (nbytes && (nbytes != size) && (!config.dont_check_file_sizes)) {
+         if (show_errors) {
+             msg_printf(project, MSG_INTERNAL_ERROR,
+Index: client/client_types.h
+===================================================================
+--- client/client_types.h	(revision 22824)
++++ client/client_types.h	(working copy)
+@@ -67,6 +67,7 @@
+     bool uploaded;          // file has been uploaded
+     bool upload_when_present;
+     bool sticky;            // don't delete unless instructed to do so
++    bool ignoreDLCheck;     //ignore any signature or MD5 checking on this file
+     bool report_on_rpc;     // include this in each scheduler request
+     bool marked_for_delete;     // server requested delete;
+         // if not in use, delete even if sticky is true

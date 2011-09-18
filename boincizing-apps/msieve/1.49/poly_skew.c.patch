@@ -1,0 +1,58 @@
+Index: gnfs/poly/poly_skew.c
+===================================================================
+--- gnfs/poly/poly_skew.c	(revision 639)
++++ gnfs/poly/poly_skew.c	(working copy)
+@@ -257,25 +257,25 @@
+ 	poly.combined_score = combined_score;
+ 	poly.skewness = skewness;
+ 
+-	printf("save %le %.4lf %.2lf %le rroots %u\n", size_score,
+-			root_score, skewness, combined_score,
+-			num_real_roots);
++	//printf("save %le %.4lf %.2lf %le rroots %u\n", size_score,
++	//		root_score, skewness, combined_score,
++	//		num_real_roots);
+ 
+ 	fprintf(data->all_poly_file, 
+-		"# norm %le alpha %lf e %.3le rroots %u\nskew: %.2lf\n", 
++		"# norm %le alpha %lf e %.3le rroots %u\nskew: %.2lf ", 
+ 		size_score, root_score, combined_score, 
+ 		num_real_roots, skewness);
+ 	for (i = 0; i <= degree; i++) {
+ 		fprintf(data->all_poly_file, "c%u: %s", i,
+ 				mpz_sgn(coeff1[i]) >= 0 ? " " : "");
+ 		mpz_out_str(data->all_poly_file, 10, coeff1[i]);
+-		fprintf(data->all_poly_file, "\n");
++		fprintf(data->all_poly_file, " ");
+ 	}
+ 	for (i = 0; i <= 1; i++) {
+ 		fprintf(data->all_poly_file, "Y%u: %s", i,
+ 				mpz_sgn(coeff2[i]) >= 0 ? " " : "");
+ 		mpz_out_str(data->all_poly_file, 10, coeff2[i]);
+-		fprintf(data->all_poly_file, "\n");
++		fprintf(data->all_poly_file, " ");
+ 	}
+ 	fflush(data->all_poly_file);
+ 
+@@ -416,7 +416,10 @@
+ 
+ 		sprintf(buf, "%s.p", obj->savefile.name);
+ 		stage2_callback_data.config = config;
+-		stage2_callback_data.all_poly_file = fopen(buf, "a");
++		if(obj->boinc)
++		  stage2_callback_data.all_poly_file = stderr;
++		else
++		  stage2_callback_data.all_poly_file = fopen(buf, "a");
+ 		if (stage2_callback_data.all_poly_file == NULL) {
+ 			printf("error: cannot open poly2 file\n");
+ 			exit(-1);
+@@ -427,7 +430,8 @@
+ 	if (do_both_stages) {
+ 		poly_stage1_run(obj, &stage1_data);
+ 
+-		fclose(stage2_callback_data.all_poly_file);
++		if(!obj->boinc)
++		  fclose(stage2_callback_data.all_poly_file);
+ 		poly_stage1_free(&stage1_data);
+ 		poly_stage2_free(&stage2_data);
+ 	}

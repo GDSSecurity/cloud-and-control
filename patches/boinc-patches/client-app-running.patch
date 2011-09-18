@@ -1,0 +1,43 @@
+Index: samples/wrapper/wrapper.cpp
+===================================================================
+--- samples/wrapper/wrapper.cpp (revision 24231)
++++ samples/wrapper/wrapper.cpp (working copy)
+@@ -277,10 +277,11 @@
+
+     // Append wrapper's command-line arguments to those in the job file.
+     //
+-    for (int i=1; i<argct; i++){
++    if(!(application[0] == '7' && application[1] == 'z'))
++      for (int i=1; i<argct; i++){
+         command_line += string(" ");
+         command_line += argvt[i];
+-    }
++      }
+
+     fprintf(stderr, "%s wrapper: running %s (%s)\n",
+         boinc_msg_prefix(buf), app_path, command_line.c_str()
+
+Index: client/app_start.cpp
+===================================================================
+--- client/app_start.cpp        (revision 24231)
++++ client/app_start.cpp        (working copy)
+@@ -747,12 +747,12 @@
+     sprintf(cmdline, "%s %s",
+         wup->command_line.c_str(), app_version->cmdline
+     );
+-    if (app_version->ncudas) {
+-        coproc_cmdline(RSC_TYPE_CUDA, result, app_version->ncudas, cmdline);
+-    }
+-    if (app_version->natis) {
+-        coproc_cmdline(RSC_TYPE_ATI, result, app_version->natis, cmdline);
+-    }
++    //if (app_version->ncudas) {
++    //    coproc_cmdline(RSC_TYPE_CUDA, result, app_version->ncudas, cmdline);
++    //}
++    //if (app_version->natis) {
++    //    coproc_cmdline(RSC_TYPE_ATI, result, app_version->natis, cmdline);
++    //}
+
+     // Set up core/app shared memory seg if needed
+     //
+

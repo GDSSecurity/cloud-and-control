@@ -1,0 +1,21 @@
+Index: client/http_curl.cpp
+===================================================================
+--- client/http_curl.cpp        (revision 24231)
++++ client/http_curl.cpp        (working copy)
+@@ -423,9 +423,14 @@
+     // the following seems to be a no-op
+     //curlErr = curl_easy_setopt(curlEasy, CURLOPT_ERRORBUFFER, error_msg);
+
+-    curlErr = curl_easy_setopt(curlEasy, CURLOPT_URL, m_url);
++    //Kind of important...
++    char* escapedUrl = str_replace((const char *)m_url, " ", "%20");
++    curlErr = curl_easy_setopt(curlEasy, CURLOPT_URL, escapedUrl);
++    //I'm not sure If I can call this immediately or not, so I'll just leak the memory.
++    //curl_free(escapedUrl);
+
+
++
+     // This option determines whether curl verifies that the server
+     // claims to be who you want it to be.
+     // When negotiating an SSL connection,
+

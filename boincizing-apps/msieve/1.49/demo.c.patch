@@ -1,0 +1,219 @@
+Index: demo.c
+===================================================================
+--- demo.c	(revision 639)
++++ demo.c	(working copy)
+@@ -12,6 +12,21 @@
+ $Id$
+ --------------------------------------------------------------------*/
+ 
++#ifdef HAVE_BOINC
++	#include <stdarg.h>
++	#ifdef _WIN32
++		#include "boinc_win.h"
++		#include "boinc_api.h"
++		#include "filesys.h"
++	#else
++		#include <boinc/boinc_api.h>
++		#include <boinc/filesys.h>
++	#endif
++
++	void boincstatus(double percent);
++	#define fopen(i,j) boinc_fopen(i,j)
++#endif
++
+ #include <msieve.h>
+ #include <signal.h>
+ 
+@@ -29,7 +44,7 @@
+ 	printf("\nreceived signal %d; shutting down\n", sig);
+ 	
+ 	if (obj && (obj->flags & MSIEVE_FLAG_SIEVING_IN_PROGRESS))
+-		obj->flags |= MSIEVE_FLAG_STOP_SIEVING;
++		obj->flags |= MSIEVE_FLAG_STOP_SIEVING | MSIEVE_FLAG_CAUGHT_SIGNAL;
+ 	else
+ 		_exit(0);
+ }
+@@ -170,7 +185,8 @@
+ 		    uint32 num_threads,
+ 		    uint32 mem_mb,
+ 		    uint32 which_gpu,
+-		    double target_density) {
++		    double target_density,
++			char boinc) {
+ 	
+ 	char *int_start, *last;
+ 	msieve_obj *obj;
+@@ -198,7 +214,7 @@
+ 					nfs_lower, nfs_upper, cpu,
+ 					cache_size1, cache_size2,
+ 					num_threads, mem_mb, which_gpu,
+-					target_density);
++					target_density, boinc);
+ 	if (g_curr_factorization == NULL) {
+ 		printf("factoring initialization failed\n");
+ 		return;
+@@ -206,8 +222,17 @@
+ 
+ 	msieve_run(g_curr_factorization);
+ 
+-	if (!(g_curr_factorization->flags & MSIEVE_FLAG_FACTORIZATION_DONE)) {
++	if (g_curr_factorization->flags & MSIEVE_FLAG_CAUGHT_SIGNAL) {
+ 		printf("\ncurrent factorization was interrupted\n");
++
++	if (boinc) {
++		char command[1000];
++		memset(command, 0, 1000);
++		strcpy(command, "rm -rf   ");
++		strncat(command + 8, nfs_fbfile_name, 990);
++		system(command);
++	}
++		
+ 		exit(0);
+ 	}
+ 
+@@ -280,8 +305,68 @@
+ #endif
+ 
+ /*--------------------------------------------------------------------*/
++#ifdef HAVE_BOINC
++int fail(const char *str,...)
++{
++	va_list ap;
++	va_start(ap,str);
++	vfprintf(stderr,str,ap);
++	va_end(ap);
++	fprintf(stderr,"\n");
++	fflush(stderr);
++	boinc_finish(-1);
++	return -1;
++}
++int msieve_main(int argc, char **argv);
+ int main(int argc, char **argv) {
++	int status;
++	char path_in[512], path_out[512];
++	
++	status = boinc_init();
++	if(status)
++		return fail("boinc_init() failed: %d",status);
++	fprintf(stderr, "boinc initialized\n");
++	
++	status = boinc_resolve_filename("input_data", path_in, sizeof(path_in) );
++	if(status)
++		return fail("cannot resolve workunit file name");
++	else
++		fprintf(stderr, "resolved input_data file to %s\n", path_in);
+ 
++	status = boinc_resolve_filename("output_data", path_out, sizeof(path_out) );
++	if(status)
++		return fail("cannot resolve result file name");
++	else
++		fprintf(stderr, "resolved output_data file to %s\n", path_out);
++  
++	fprintf(stderr, "work files resolved, now working\n");
++
++	stdout = stderr;
++  
++	int newArgc = 6;
++	char ** newArgv[6];
++	newArgv[0] = argv[0];
++	newArgv[1] = "-i";
++	newArgv[2] = path_in;
++	newArgv[3] = "-nf";
++	newArgv[4] = path_out;
++	newArgv[5] = "-np";
++
++	int i;
++	for(i=0; i<newArgc; i++)
++		fprintf(stderr,"-> %s\n",newArgv[i]);
++	
++	int ret = msieve_main(newArgc, newArgv);
++
++	boinc_finish(ret);
++	return ret;
++}
++
++int msieve_main(int argc, char **argv) {
++#else
++int main(int argc, char **argv) {
++#endif
++
+ 	char buf[400];
+ 	uint32 seed1, seed2;
+ 	char *savefile_name = NULL;
+@@ -549,7 +634,7 @@
+ 				nfs_lower, nfs_upper, cpu,
+ 				cache_size1, cache_size2,
+ 				num_threads, mem_mb, 
+-				which_gpu, target_density);
++				which_gpu, target_density, 0);
+ 	}
+ 	else if (manual_mode) {
+ 		while (1) {
+@@ -564,7 +649,7 @@
+ 					nfs_lower, nfs_upper, cpu,
+ 					cache_size1, cache_size2,
+ 					num_threads, mem_mb, 
+-					which_gpu, target_density);
++					which_gpu, target_density, 0);
+ 			if (feof(stdin))
+ 				break;
+ 		}
+@@ -572,10 +657,42 @@
+ 	else {
+ 		FILE *infile = fopen(infile_name, "r");
+ 		if (infile == NULL) {
+-			printf("cannot open input file '%s'\n", infile_name);
+-			return 0;
++			fprintf(stderr, "cannot open input file '%s'\n", infile_name);
++			return -1;
+ 		}
+ 
++#ifdef HAVE_BOINC
++		char miscbuf[400];
++		memset(miscbuf, 0, sizeof(miscbuf));
++		fgets(miscbuf, (int)sizeof(miscbuf), infile);
++		nfs_lower = (uint64)strtod(miscbuf, NULL);
++		
++		memset(miscbuf, 0, sizeof(miscbuf));
++		fgets(miscbuf, (int)sizeof(miscbuf), infile);
++		nfs_upper = (uint64)strtod(miscbuf, NULL);
++		
++		memset(buf, 0, sizeof(buf));
++		fgets(buf, (int)sizeof(buf), infile);
++
++		printf("nfs_lower %llu\n", nfs_lower);
++		printf("nfs_upper %llu\n", nfs_upper);
++		printf("buf %s\n", buf);
++
++#ifdef HAVE_CUDA		
++		if (!feof(stdin)) {
++			memset(miscbuf, 0, sizeof(miscbuf));
++			fgets(miscbuf, (int)sizeof(miscbuf), infile);
++			which_gpu = atol(miscbuf);
++		}
++#endif
++		factor_integer(buf, flags, savefile_name, 
++			logfile_name, nfs_fbfile_name,
++			&seed1, &seed2,
++			max_relations, 
++			nfs_lower, nfs_upper, cpu,
++			cache_size1, cache_size2,
++			num_threads, mem_mb, which_gpu, target_density, 1);
++#else
+ 		while (1) {
+ 			buf[0] = 0;
+ 			fgets(buf, (int)sizeof(buf), infile);
+@@ -586,10 +703,12 @@
+ 					nfs_lower, nfs_upper, cpu,
+ 					cache_size1, cache_size2,
+ 					num_threads, mem_mb, 
+-					which_gpu, target_density);
++					which_gpu, target_density, 0);
+ 			if (feof(infile))
+ 				break;
+ 		}
++#endif
++
+ 		fclose(infile);
+ 	}
+ 

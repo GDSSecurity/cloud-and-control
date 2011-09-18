@@ -1,0 +1,41 @@
+boinc-client
+boinc-client-autostart
+	I had issues with the supplied boinc-client init script.  This is my 
+	slightly edited version, as well as the one I used to autostart and 
+	autoattach for automating EC2 instances.  (Best compared in a diff tool.)
+	
+	You will need to edit the autostart file. Look for YOURBOINCURL & 
+	YOURACCOUNTSECRET
+
+	
+client-curl-fix.patch
+	BOINC was erroring when downloading files with special characters.
+	This patch fixes it ONLY for spaces.
+	See http://lists.ssl.berkeley.edu/pipermail/boinc_dev/2011-September/018007.html
+client-debugging-info.patch
+	Adds some debugging information to the logfile that had to do with resource 
+	estimation.
+client-app-running.patch
+	1) Edits the wrapper app to NOT append command line arguments when it is 
+	   running a task that begins with "7z".  Was causing 'command not 
+	   recognized' with 7z
+	2) Does not append GPU specific command line arguments when running GPU apps
+	   Again, causing 'command not recognized' errors, this time with 
+	   cudahashcat+
+client-platform-tomfoolery.patch
+	See TODO
+	
+	
+server-moreapps.patch
+	I ran into a limit with BOINC where I added more apps and verions than it 
+	had a limit for.  I upped it.  It's annoying to do this midway through,
+	I suggest you up it in the beginning.
+server-multithreaded.patch
+	A patch to change a command line argument from --nthreads to --threads
+	to work with hashcat.
+	Also some more verbose diagnostic info.
+
+	
+server-builddirs.patch	
+client-builddirs.patch
+	TODO

@@ -1,0 +1,13 @@
+Index: client/cs_platforms.cpp
+===================================================================
+--- client/cs_platforms.cpp     (revision 24231)
++++ client/cs_platforms.cpp     (working copy)
+@@ -76,6 +76,8 @@
+ //
+ void CLIENT_STATE::detect_platforms() {
+
++  add_platform(HOSTTYPE);
++
+ #if defined(_WIN32) && !defined(__CYGWIN32__)
+ #if defined(_WIN64) && defined(_M_X64)
+     add_platform("windows_x86_64");

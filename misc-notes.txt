@@ -1,0 +1,7 @@
+The Amazon AMIs often have some old version of gcc, and you need to emerge/apt-get/yum install/whatever gcc44 and edit the makefile to use that.
+
+I was working off BOINC 6.11.1
+	svn co http://boinc.berkeley.edu/svn/branches/server_stable
+	http://boinc.berkeley.edu/trac/wiki/SourceCode
+	http://boinc.berkeley.edu/trac/wiki/BuildSystem
+	

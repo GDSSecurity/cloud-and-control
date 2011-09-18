@@ -1,0 +1,33 @@
+Index: include/msieve.h
+===================================================================
+--- include/msieve.h	(revision 639)
++++ include/msieve.h	(working copy)
+@@ -86,7 +86,8 @@
+ 	MSIEVE_FLAG_NFS_SQRT = 0x800,    /* if input is large enough, perform
+ 	                                    square root phase for NFS */
+ 	MSIEVE_FLAG_NFS_LA_RESTART = 0x1000,/* restart the NFS linear algbra */
+-	MSIEVE_FLAG_DEEP_ECM = 0x2000    /* perform nontrivial-size ECM */
++	MSIEVE_FLAG_DEEP_ECM = 0x2000,    /* perform nontrivial-size ECM */
++	MSIEVE_FLAG_CAUGHT_SIGNAL = 0x4000
+ };
+ 	
+ /* structure encapsulating the savefile used in a factorization */
+@@ -158,6 +159,8 @@
+ 	double target_density;   /* the target number of nonzeros per matrix
+ 				    column, used in NFS filtering */
+ 	char *mp_sprintf_buf;    /* scratch space for printing big integers */
++	
++	char boinc;
+ } msieve_obj;
+ 
+ msieve_obj * msieve_obj_new(char *input_integer,
+@@ -176,7 +179,8 @@
+ 			    uint32 num_threads,
+ 			    uint32 mem_mb,
+ 			    uint32 which_gpu,
+-			    double target_density);
++			    double target_density,
++				char boinc);
+ 
+ msieve_obj * msieve_obj_free(msieve_obj *obj);
+ 

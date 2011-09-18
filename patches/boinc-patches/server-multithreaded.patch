@@ -1,0 +1,51 @@
+Index: sched/sched_customize.cpp
+===================================================================
+--- sched/sched_customize.cpp	(revision 22824)
++++ sched/sched_customize.cpp	(working copy)
+@@ -124,17 +124,15 @@
+     if (nthreads > 64) nthreads = 64;
+     hu.avg_ncpus = nthreads;
+     hu.max_ncpus = nthreads;
+-    sprintf(hu.cmdline, "--nthreads %d", nthreads);
++    sprintf(hu.cmdline, "--threads=%d", nthreads);
+     hu.projected_flops = sreq.host.p_fpops*hu.avg_ncpus*.99;
+         // the .99 ensures that on uniprocessors a sequential app
+         // will be used in preferences to this
+     hu.peak_flops = sreq.host.p_fpops*hu.avg_ncpus;
+-    if (config.debug_version_select) {
+-        log_messages.printf(MSG_NORMAL,
+-            "[version] %s Multi-thread app projected %.2fGS\n",
+-            plan_class, hu.projected_flops/1e9
+-        );
+-    }
++    log_messages.printf(MSG_NORMAL,
++			"[version] %s Multi-thread app projected %.2fGS\n",
++			plan_class, hu.projected_flops/1e9
++			);
+     return true;
+ }
+ 
+@@ -380,15 +378,14 @@
+         return false;
+     }
+ 
+-    if (config.debug_version_select) {
+-        log_messages.printf(MSG_NORMAL,
+-            "[version] %s app projected %.2fG peak %.2fG %.3f CPUs\n",
+-            plan_class,
+-            hu.projected_flops/1e9,
+-            hu.peak_flops/1e9,
+-            hu.avg_ncpus
+-        );
+-    }
++    log_messages.printf(MSG_NORMAL,
++			"[version] %s app projected %.2fG peak %.2fG %.3f CPUs\n",
++			plan_class,
++			hu.projected_flops/1e9,
++			hu.peak_flops/1e9,
++			hu.avg_ncpus
++			);
++
+     return true;
+ }
+ 

@@ -1,0 +1,13 @@
+Index: gnfs/poly/stage1/stage1_sieve_cpu.c
+===================================================================
+--- gnfs/poly/stage1/stage1_sieve_cpu.c	(revision 639)
++++ gnfs/poly/stage1/stage1_sieve_cpu.c	(working copy)
+@@ -432,7 +432,7 @@
+ 	}
+ 
+ 	num_p = hash_array.num_p;
+-#if 1
++#if 0
+ 	printf("aprogs: %u entries, %u roots\n", num_p, 
+ 					hash_array.num_roots);
+ #endif

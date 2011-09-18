@@ -1,0 +1,44 @@
+Index: Makefile
+===================================================================
+--- Makefile	(revision 639)
++++ Makefile	(working copy)
+@@ -16,8 +16,10 @@
+ # get overridden by architecture-specific builds)
+ CC = gcc -D_FILE_OFFSET_BITS=64
+ WARN_FLAGS = -Wall -W
+-OPT_FLAGS = -O3 -fomit-frame-pointer -march=k8 -DNDEBUG -D_LARGEFILE64_SOURCE
++OPT_FLAGS = -O3 -fomit-frame-pointer -march=native -DNDEBUG -D_LARGEFILE64_SOURCE
+ 
++BOINCLDFLAGS += -I../../../boinc-libs -L../../../boinc-libs -lboinc_api -lboinc
++
+ # use := instead of = so we only run the following once
+ SVN_VERSION := $(shell svnversion .)
+ ifeq ($(SVN_VERSION),)
+@@ -279,6 +281,8 @@
+ 	ranlib libmsieve.a
+ 	$(CC) $(CFLAGS) demo.c -o msieve $(LDFLAGS) \
+ 			libmsieve.a $(LIBS)
++	$(CC) $(CFLAGS) demo.c -o msieve-boinc $(LDFLAGS) \
++			$(BOINCLDFLAGS) -DHAVE_BOINC libmsieve.a $(LIBS)
+ 
+ x86_64: $(COMMON_OBJS) $(QS_OBJS) $(QS_CORE_OBJS) \
+ 		$(QS_CORE_OBJS_X86_64) $(NFS_OBJS) $(GPU_OBJS)
+@@ -289,6 +293,8 @@
+ 	ranlib libmsieve.a
+ 	$(CC) $(CFLAGS) demo.c -o msieve $(LDFLAGS) \
+ 			libmsieve.a $(LIBS)
++	$(CC) $(CFLAGS) demo.c -o msieve-boinc $(LDFLAGS) \
++			$(BOINCLDFLAGS) -DHAVE_BOINC libmsieve.a $(LIBS)
+ 
+ generic: $(COMMON_OBJS) $(QS_OBJS) $(QS_CORE_OBJS) $(NFS_OBJS) $(GPU_OBJS)
+ 	rm -f libmsieve.a
+@@ -299,7 +305,8 @@
+ 			libmsieve.a $(LIBS)
+ 
+ clean:
+-	rm -f msieve msieve.exe libmsieve.a $(COMMON_OBJS) 	\
++	rm -f msieve-boinc msieve-boinc.exe msieve msieve.exe \
++		libmsieve.a $(COMMON_OBJS) 	\
+ 		$(QS_OBJS) $(QS_CORE_OBJS) $(QS_CORE_OBJS_X86) \
+ 		$(QS_CORE_OBJS_X86_64) $(NFS_OBJS) \
+ 		$(NFS_GPU_OBJS) $(NFS_NOGPU_OBJS) *.ptx
