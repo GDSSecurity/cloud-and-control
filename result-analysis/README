@@ -1,0 +1,42 @@
+These are big tables of data from a few factoring runs and the korelogic 2010
+cracking data.
+
+================================================================================
+Cracking Analysis
+================================================================================
+
+korelogic-trial-run-all-results.xlsx
+	Here's the motherload of cracking results data.  How well I estimated,
+	what wordlists crackes the most passwords (this is a little skewed, cause I
+	would try and remove cracked passwords from later processing), floating 
+	point operations per worldist word, for all the hash types.
+	
+korelogic-trial-run-hashtypes.gnumeric
+	The graphs from "Failure by Hash Type".
+	This shows how many I cracked, I didn't crack, and No one cracked, from the 
+	2010 contest.
+	
+
+================================================================================
+Factoring	
+================================================================================
+
+Factoring Graphs.gnumeric
+	This contains a lot of raw data, and some preliminary goal-seek data for
+	different sievers and polynomials. The other files are more specific.
+
+fpops per q comparison.gnumeric
+	This is the data and graphs relating to floating point operations spent for
+	a given Q range for different sievers and polynomials .
+	
+relations per q comparison.gnumeric
+	This is the data and graphs to get the curves for relations obtained for 
+	different sievers and polynomials as a function of the Q range.
+
+sec per rel comparison.gnumeric
+	This graph wasn't used, but it's the data and graph for seconds spent to 
+	obtain a relation for different sievers and polynomials.
+	
+relations under the curve.gnumeric
+	This is the data and graphs to get a dollar figure for each of the different
+	sievers/polynomials.  
