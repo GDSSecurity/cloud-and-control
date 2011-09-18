@@ -1,0 +1,114 @@
+SELECT
+	FROM_UNIXTIME(r.received_time - ROUND(r.yield * r.secrel, 0), '%c/%e/%y %T') as calcedsendtime,
+	'' as job,
+	grps.concurrent,
+	CONCAT(
+		TRUNCATE((r.yield * r.secrel) /60, 0)
+		, 'm'
+		, (ROUND(r.yield * r.secrel, 0) - (60 * TRUNCATE((r.yield * r.secrel) /60, 0)))
+		, 's'
+		) as calcedtime,
+	/*
+		r.sent_time,
+		FROM_UNIXTIME(r.startbucket, '%c/%e/%y %T') AS startbucket,
+		FROM_UNIXTIME(r.sent_time, '%c/%e/%y %T') as realsendtime,
+		r.host,
+		r.p_fpops as host_fpops,
+		r.p_fpops * ( r.received_time - r.sent_time) as total_fpops,
+		CONCAT(
+			TRUNCATE((r.received_time - r.sent_time) /60, 0)
+			, 'm'
+			, (ROUND(r.received_time - r.sent_time, 0) - (60 * TRUNCATE((r.received_time - r.sent_time) /60, 0)))
+			, 's'
+			) as realtime,
+	*/
+	r.yield,
+	CONCAT(r.secrel, ' sec/rel') as secrel,
+	cast(r.qstart as char(50)) as qstart,
+	cast(r.qincrement as char(50)) as qincrement,
+	(r.p_fpops * ( r.received_time - r.sent_time)) / qincrement as fpops_per_q,
+	r.host
+FROM (
+
+
+SELECT
+		CASE
+			WHEN h.domain_name LIKE '%cidal' THEN h.domain_name
+			WHEN h.p_model LIKE '%Intel(R) Xeon(R) CPU%' THEN 
+				CONCAT('Xeon ', SUBSTRING( trim(replace(h.p_model, 'Intel(R) Xeon(R) CPU ', '')),
+					1, INSTR(trim(replace(h.p_model, 'Intel(R) Xeon(R) CPU ', '')), 'Hz')
+					))
+			WHEN h.p_model LIKE '%Dual-Core AMD Opteron(tm) Processor%' THEN
+				CONCAT('Opteron ', SUBSTRING( replace(h.p_model, 'Dual-Core AMD Opteron(tm) Processor ', ''),
+					1, INSTR(replace(h.p_model, 'Dual-Core AMD Opteron(tm) Processor', ''), '[') - 2
+					))
+			ELSE 'Unknown'
+			END as host,
+		r.hostid,
+		h.p_fpops,
+		r.received_time,
+		r.sent_time,
+		FLOOR(r.sent_time/1800) * 1800 as startbucket,
+		CAST(stderr_out AS CHAR(10000) CHARACTER SET utf8) as output,
+		REPLACE(
+			SUBSTRING(
+				CAST(stderr_out AS CHAR(10000) CHARACTER SET utf8),
+				INSTR(CAST(stderr_out AS CHAR(10000) CHARACTER SET utf8), 'total yield')+13,
+				6),
+			',', '')
+		as yield,
+		SUBSTRING(
+			CAST(stderr_out AS CHAR(10000) CHARACTER SET utf8),
+			INSTR(CAST(stderr_out AS CHAR(10000) CHARACTER SET utf8), 'sec/rel')-8,
+			7)
+		 as secrel,
+		substring_index(
+			substring_index(
+				substring_index(
+					substring(stderr_out,
+						instr(stderr_out, 'resolved input_data'),
+						instr(stderr_out, 'resolved output_data') - instr(stderr_out, 'resolved input_data')
+						), '_', -4
+				), '_', 2
+			), '_', 1) as qstart,
+		substring_index(
+			substring_index(
+				substring_index(
+					substring(stderr_out,
+						instr(stderr_out, 'resolved input_data'),
+						instr(stderr_out, 'resolved output_data') - instr(stderr_out, 'resolved input_data')
+						), '_', -4
+				), '_', 2
+			), '_', -1) as qincrement
+FROM result r
+INNER JOIN app_version av
+  on av.id = r.app_version_id
+INNER JOIN app a
+  on a.id = av.appid
+INNER JOIN host h
+	  on r.hostid = h.id
+WHERE a.id IN (6,7,11,12,13,14)
+
+
+) r
+INNER JOIN
+(
+	SELECT
+			FLOOR(r.sent_time/1800) * 1800 as startbucket,
+			r.hostid,
+			count(*) as concurrent
+	FROM result r
+	INNER JOIN app_version av
+	  on av.id = r.app_version_id
+	INNER JOIN app a
+	  on a.id = av.appid
+	WHERE a.id IN (6,7,11,12,13,14)
+	GROUP BY
+		r.hostid,
+		FLOOR(r.sent_time/1800) * 1800
+) grps
+	ON grps.startbucket = r.startbucket
+	AND grps.hostid = r.hostid
+WHERE yield <> 0
+ORDER BY r.received_time - ROUND(r.yield * r.secrel, 0) ASC
+LIMIT 0, 25000

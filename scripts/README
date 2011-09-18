@@ -1,4 +1,13 @@
 =================================================
+Utility Scripts
+=================================================
+gunzipresults.sh
+	Your results may be uploaded gzipped if you specified gzip_when_done in your
+	output template.  However, the files don't have the .gz suffix.  This script
+	will run through sample_results, find the gzipped ones, and gunzip them.
+	
+	
+=================================================
 Factoring Scripts (in logical order)
 =================================================
 Makefile
@@ -8,3 +17,29 @@ mkpolysearchrange.cpp
 	
 	You will need to edit it to write to the appropriate temp file directory.
 	(Search for tmp_hostname)
+	
+
+gengnfsjob.php
+	Takes a chosen polynomial and creates a job template for use with 
+	gengnfswu.php.  
+	This script contains logic taken from GGNFS, factLat.pl[1], and 
+	factmsieve.py[2].  A lot of this logic is old knowledge passed down
+	in the form of text files like def-par.txt that give default values
+	and are full of magic constants.
+	
+	When I wrote this, I wanted to make sure it produced the same output as
+	factmsieve.py, so I wrote the comparison script in genjob-testharness/
+	
+gengnfswu.php
+	Generates work units for GGNFS.  Relatively straightforward script.
+
+	
+	
+[1] factLat.pl is the original fire-and-forget factoring script that runs 
+    multiple programs through the semiprime factoring process. 
+	http://gilchrist.ca/jeff/factoring/nfs_beginners_guide_perl.html
+[2] factmsieve.py is an update to factLat.pl by Brian Gladman take scripts the 
+    entire factoring process for a fire-and-forget manner.  Of course it doesn't
+	work well when that's a 3 month process for a 512 bit semiprime. ;)  
+    http://gladman.plushost.co.uk/oldsite/computing/factoring.php
+	

@@ -1,0 +1,12 @@
+These scripts and queries are for getting statistics out of large runs.
+
+YOU WILL NEED TO EDIT THEM BEFORE RUNNING.
+
+ - I limit on the id of the apps for each script.  It looks like:
+		a.id IN (15, 17) 
+   You will need to change those hardcoded id's to be the ids in your app table
+   for the specific app of the script.
+
+   
+msieve-parse.txt
+   Parses out data for the polynomial selection runs.  A single SQL Query

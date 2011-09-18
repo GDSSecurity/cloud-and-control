@@ -1,0 +1,77 @@
+SELECT
+	FROM_UNIXTIME(r.sent_time, '%c/%e/%y %T') as sendtime,
+	FROM_UNIXTIME(r.startbucket, '%c/%e/%y %T') AS startbucket,
+	grps.concurrent,
+	CONCAT(
+		TRUNCATE((r.received_time - r.sent_time) /60, 0)
+		, 'm'
+		, (ROUND(r.received_time - r.sent_time, 0) - (60 * TRUNCATE((r.received_time - r.sent_time) /60, 0)))
+		, 's'
+		) as realtime,
+	CONVERT(((LENGTH(r.output) - LENGTH(REPLACE(r.output, '# norm', '')) ) / 6), UNSIGNED) as numResults,
+	coeff_start,
+	coeff_end,
+	coeff_end - coeff_start as coeff_span,
+	r.p_fpops as host_fpops,
+	r.p_fpops * ( r.received_time - r.sent_time) as total_fpops,
+	r.host,
+	r.appname
+FROM (
+
+
+SELECT
+		case
+			when h.domain_name LIKE '%cidal' then h.domain_name
+			else SUBSTRING( replace(h.p_model, 'Intel(R) Xeon(R) CPU          ', ''),
+					1, INSTR(replace(h.p_model, 'Intel(R) Xeon(R) CPU          ', ''), 'Hz')
+					)
+			end as host,
+		r.hostid,
+		h.p_fpops,
+        r.received_time,
+		r.sent_time,
+		FLOOR(r.sent_time/1800) * 1800 as startbucket,
+		CONVERT(SUBSTRING(
+			r.stderr_out,
+			LOCATE('nfs_lower', r.stderr_out) + 10,
+			LOCATE('\n', r.stderr_out, LOCATE('nfs_lower', r.stderr_out)) - LOCATE('nfs_lower', r.stderr_out) - 10
+			), UNSIGNED) as coeff_start,
+		CONVERT(SUBSTRING(
+			r.stderr_out,
+			LOCATE('nfs_upper', r.stderr_out) + 10,
+			LOCATE('\n', r.stderr_out, LOCATE('nfs_upper', r.stderr_out)) - LOCATE('nfs_upper', r.stderr_out) - 10
+			), UNSIGNED) as coeff_end,
+        CAST(stderr_out AS CHAR(50000) CHARACTER SET utf8) as output,
+		a.name as appname
+FROM result r
+INNER JOIN app_version av
+  on av.id = r.app_version_id
+INNER JOIN app a
+  on a.id = av.appid
+INNER JOIN host h
+      on r.hostid = h.id
+WHERE a.id IN (15)
+
+
+) r
+INNER JOIN 
+(
+	SELECT
+		FLOOR(r.sent_time/1800) * 1800 as startbucket,
+		r.hostid,
+		count(*) as concurrent
+	FROM result r
+	INNER JOIN app_version av
+	  on av.id = r.app_version_id
+	INNER JOIN app a
+	  on a.id = av.appid
+	WHERE a.id IN (15)
+	GROUP BY 
+		r.hostid,
+		FLOOR(r.sent_time/1800) * 1800
+) grps
+	ON grps.startbucket = r.startbucket
+	AND grps.hostid = r.hostid
+ORDER BY r.startbucket, r.hostid
+LIMIT 0, 250
+
