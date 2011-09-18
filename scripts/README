@@ -1,6 +1,26 @@
 =================================================
 Utility Scripts
 =================================================
+showmurphy.sh
+	A simple one-liner that will show you the Murphy scores of the polynomials 
+	found so far,
+	
+potupdater.sh
+	This script is DESIGNED to watch as cracking results come in from clients,
+	and update the john.pot and hashcat hashlist files.  This way, no extra work
+	is expended cracking hashes that have already been cracked.  Not important
+	for hashes like MD5 or NTLM, but potentially valuable for Unix MD5 or 
+	Blowfish.
+	
+	This script requires files be named very specifically (corresponding to 
+	genjohnwu.php), and that BOINC server and client be patched to add the 
+	ignore_download_checks option to input templates.  The file's hash will 
+	change when it's rewritten, so without that patch, the workunit will error.
+	
+	The script has a bug in it.  I'm not quite sure where though.  It causes the 
+	resulting .pot and hashcat files to be screwy though.  If you actually want 
+	to try it, I suggest you set up a large NTLM set of hashes and run them.
+	
 gunzipresults.sh
 	Your results may be uploaded gzipped if you specified gzip_when_done in your
 	output template.  However, the files don't have the .gz suffix.  This script
@@ -43,3 +63,55 @@ gengnfswu.php
 	work well when that's a 3 month process for a 512 bit semiprime. ;)  
     http://gladman.plushost.co.uk/oldsite/computing/factoring.php
 	
+=================================================
+Cracking Scripts
+=================================================
+genjohnwu.php
+genjohnwu-tools.php
+	I am not pround of this script.  But, it works (at least for me).
+	It started simply enough, similar to gengnfswu.php - so I never bothered 
+	refactoring it or writing it in another language.  Instead I just kept
+	hacking it, and it grew and grew into the pile of shit it is now. Sorry.
+	Fair warning - it uses a lot of global variables to keep state.  I know.
+	
+	This script produces workunits for cracking.
+	It requires:
+		-b the base name for the workunits
+		-c a john.pot file that should contain a few cracked passwords already
+		   this is assumed to exist, cause you run john --single mode w/o boinc
+		-f the format of the hash type you are operating on. Run without options
+		   to get a list
+		-a the application name you want to run.  
+		--hashcat-hashes the list of hashes you want to crack, in the format 
+		                 acceptable to hashcat
+						 If you are not running hashcat, you can give /dev/null
+		--john-hashes	 this list of hashes you want to crack, in the format
+						 acceptable to john
+						 Always required, because it is used for salt counts
+		-p the 'phase' of cracking you want to run
+		
+	Running this script with a POSITIVE integer phase, will tell you the 
+	subphases.  Example:
+	
+	$ ./genjohnwu.php -a john -c /SCRATCH/korelogictrialrun/phase1/NT.txt/john.pot -b newjohn -f nt --john-hashes=/SCRATCH/korelogictrialrun/hashes/john/NT.txt --hashcat-hashes=/dev/null -p 2
+	generating work for newjohn...
+	Working on Phase 2
+	Run Phases 2.1 (wordlists) and 2.2 (incremental)
+
+	Run it again with the subphase to actually create the work script.  
+	
+	$ ./genjohnwu.php -a john -c /SCRATCH/korelogictrialrun/phase1/NT.txt/john.pot -b newjohn -f nt --john-hashes=/SCRATCH/korelogictrialrun/hashes/john/NT.txt --hashcat-hashes=/dev/null -p 2.1
+	generating work for newjohn...
+	Working on Phase 2.1
+	.........10
+	..........20
+	..........30
+	..........40
+	...
+	done, created 42 jobs
+
+	Running it with negative integers are various specific testing phases. For 
+	example, -1 - merely prints the wordlist names it will generate jobs for.
+	
+	
+	 
