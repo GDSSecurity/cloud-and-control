@@ -142,8 +142,8 @@ function getSaltCount()
 	if(!empty($saltCache[$passwordfile_john]))
 		return $saltCache[$passwordfile_john];
 
-	exec("rm -f /home/tom/amber/build/john-jumbo12-clean/john.pot /home/tom/amber/build/john-jumbo12-clean/john.log");
-	exec("/home/tom/amber/build/john-jumbo12-clean/john --format=" . $hashformat['john-format'] . " --wordlist=/dev/null " . $passwordfile_john . " 2>/dev/null",
+	exec("rm -f /path/to/john/location/john.pot /path/to/john/location/john.log");
+	exec("/path/to/john/location/john --format=" . $hashformat['john-format'] . " --wordlist=/dev/null " . $passwordfile_john . " 2>/dev/null",
 		$output, $ret);
 	if($ret != 0)
 		die("john died when trying to get salt values\n");

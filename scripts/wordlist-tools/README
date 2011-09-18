@@ -1,0 +1,34 @@
+For these scripts it's going to be helpful to know I had two directories I was 
+working with: lvl123 and lvl185.  These corresponded to two markov lists.
+ lvl123 was small, and the higher probability markovs.
+ lvl185 was large, and the lower probability markovs.
+
+Doing a uniqueness test on lvl185 could take a week - some of the files were 
+600 MB large.
+
+
+fastNoProgressUniqueCalc.py
+	This will tell you the number of unique lines in a set of files in an
+	algorithmiclly fastest way.  (It'd still be faster in, say, C).
+	See Also: http://stackoverflow.com/questions/4789637/most-efficient-way
+	
+repeatRates.py
+	This is much better than fastNoProgressUniqueCalc.py because it will 
+	actually unique the files.  All the repeat words that are repeated in 5 
+	files will wind up in repeats-5, and so on.  
+	You can then use these repeat files to 'comm -1 -3' later on.
+
+wordlistOverlapMatrix.py
+	This will calculate the overlap percentage pairwise of a directory of 
+	wordlists.
+	You're going to want to read this (it's short) before reading it.
+
+genPotStats.py
+	This was an attempt to parse out how many cracks could be attributed to 
+	individual john rules.  It wasn't really used.
+
+regenerate-manglingrules/
+	These were awk scripts I used to recreate john mangling rules, to pre-mangle
+	wordlists, and then subtract out the resulting words from the wordlists, so
+	I didn't have pre-mangled words in the original wordlist.
+	(That's actually a bad idea most likely.)

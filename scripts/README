@@ -109,9 +109,22 @@ genjohnwu-tools.php
 	..........40
 	...
 	done, created 42 jobs
+	
+	./genjohnwu.php -a hashcat -c /SCRATCH/korelogictrialrun/phase1/NT.txt/john.pot -b hashcattest -f nt --john-hashes=/SCRATCH/korelogictrialrun/hashes/john/NT.txt --hashcat-hashes=/SCRATCH/korelogictrialrun/hashes/hashcat/mode-1000 -p 3.1
+	generating work for hashcattest...
+	Working on Phase 3.1
+	.........10
+	..........20
+	..........30
+	.........
+	done, created 38 jobs
+
 
 	Running it with negative integers are various specific testing phases. For 
 	example, -1 - merely prints the wordlist names it will generate jobs for.
 	
-	
+	It does a lot of weird shit, one of which is in some cases it will actually 
+	invoke john the ripper if necessary to determine the salt count.  This is
+	in getSaltCount() - and you will need to edit it with your paths to make 
+	sure it works.
 	 
