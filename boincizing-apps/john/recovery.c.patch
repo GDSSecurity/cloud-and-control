@@ -1,0 +1,41 @@
+--- a/src/recovery.c
++++ b/src/recovery.c
+@@ -42,7 +42,7 @@ extern int ftruncate(int fd, size_t length);
+ #include "status.h"
+ #include "recovery.h"
+ 
+-char *rec_name = RECOVERY_NAME;
++char *rec_name = 0;
+ #ifdef HAVE_MPI
+ int rec_name_completed = 0;
+ #else
+@@ -104,6 +104,8 @@ static void rec_lock(void)
+ 
+ void rec_init(struct db_main *db, void (*save_mode)(FILE *file))
+ {
++	if(rec_name == 0) rec_name = RECOVERY_NAME;
++
+ 	rec_done(1);
+ 
+ 	if (!rec_argc) return;
+@@ -121,7 +123,7 @@ void rec_init(struct db_main *db, void (*save_mode)(FILE *file))
+ 
+ void rec_save(void)
+ {
+-	int save_format, hund;
++	int i, save_format, hund;
+ 	long size;
+ 	char **opt;
+ 
+@@ -141,9 +143,8 @@ void rec_save(void)
+ 	fprintf(rec_file, RECOVERY_V "\n%d\n",
+ 		rec_argc + (save_format ? 1 : 0));
+ 
+-	opt = rec_argv;
+-	while (*++opt)
+-		fprintf(rec_file, "%s\n", *opt);
++	for(i=0; i<rec_argc; i++)
++		fprintf(rec_file, "%s\n", rec_argv[i]);
+ 
+ 	if (save_format)
+ 		fprintf(rec_file, "--format=%s\n",

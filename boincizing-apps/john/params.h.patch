@@ -1,0 +1,41 @@
+--- a/src/params.h
++++ b/src/params.h
+@@ -66,6 +66,11 @@
+ #define JOHN_PRIVATE_HOME		"~/.john"
+ #endif
+ 
++extern char* POT_NAME;
++extern char* LOG_NAME;
++extern char* RECOVERY_NAME;
++extern char* CFG_FULL_NAME;
++
+ /*
+  * Crash recovery file format version strings.
+  */
+@@ -105,26 +110,10 @@
+ /*
+  * File names.
+  */
+-#define CFG_FULL_NAME			"$JOHN/john.conf"
+-#define CFG_ALT_NAME			"$JOHN/john.ini"
+ #if JOHN_SYSTEMWIDE
+ #define CFG_PRIVATE_FULL_NAME		JOHN_PRIVATE_HOME "/john.conf"
+ #define CFG_PRIVATE_ALT_NAME		JOHN_PRIVATE_HOME "/john.ini"
+-#define POT_NAME			JOHN_PRIVATE_HOME "/john.pot"
+-#define LOG_NAME			JOHN_PRIVATE_HOME "/john.log"
+-#ifdef HAVE_MPI
+-#define RECOVERY_NAME			JOHN_PRIVATE_HOME "/john"
+-#else
+-#define RECOVERY_NAME			JOHN_PRIVATE_HOME "/john.rec"
+-#endif /* HAVE_MPI */
+-#else
+-#define POT_NAME			"$JOHN/john.pot"
+-#define LOG_NAME			"$JOHN/john.log"
+-#ifdef HAVE_MPI
+-#define RECOVERY_NAME			"$JOHN/john"
+ #else
+-#define RECOVERY_NAME			"$JOHN/john.rec"
+-#endif /* HAVE_MPI */
+ #endif
+ #define LOG_SUFFIX			".log"
+ #define RECOVERY_SUFFIX			".rec"

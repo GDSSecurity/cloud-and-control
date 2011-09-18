@@ -1,0 +1,57 @@
+--- a/src/getopt.c
++++ b/src/getopt.c
+@@ -119,34 +119,28 @@ static int opt_check_one(struct opt_entry *list, opt_flags flg, char *opt)
+ 	return OPT_ERROR_NONE;
+ }
+ 
+-void opt_process(struct opt_entry *list, opt_flags *flg, char **argv)
++void opt_process(struct opt_entry *list, opt_flags *flg, int argc, char **argv)
+ {
+-	char **opt;
+-	int res;
+-
+-	if (*(opt = argv))
+-	while (*++opt)
+-	if ((res = opt_process_one(list, flg, *opt))) {
+-#ifdef HAVE_MPI
+-		if (mpi_id == 0)
+-#endif
+-		fprintf(stderr, "%s: \"%s\"\n", opt_errors[res], *opt);
+-		error();
+-	}
++	int res, i;
++
++	for(i=0; i<argc; i++)
++          {
++	    if ((res = opt_process_one(list, flg, argv[i]))) {
++	      fprintf(stderr, "%s: \"%s\"\n", opt_errors[res], argv[i]);
++	      error();
++	    }
++	  }
+ }
+ 
+-void opt_check(struct opt_entry *list, opt_flags flg, char **argv)
++void opt_check(struct opt_entry *list, opt_flags flg, int argc, char **argv)
+ {
+-	char **opt;
+-	int res;
+-
+-	if (*(opt = argv))
+-	while (*++opt)
+-	if ((res = opt_check_one(list, flg, *opt))) {
+-#ifdef HAVE_MPI
+-		if (mpi_id == 0)
+-#endif
+-		fprintf(stderr, "%s: \"%s\"\n", opt_errors[res], *opt);
+-		error();
+-	}
++	int res, i;
++
++	for(i=0; i<argc; i++)
++	  {
++	    if ((res = opt_check_one(list, flg, argv[i]))) {
++	      fprintf(stderr, "%s: \"%s\"\n", opt_errors[res], argv[i]);
++	      error();
++	    }
++	  }
+ }

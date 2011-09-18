@@ -1,0 +1,13 @@
+diff --git a/src/md5_gen_utils.c b/src/md5_gen_utils.c
+index 3a95c90..fa956d2 100644
+--- a/src/md5_gen_utils.c
++++ b/src/md5_gen_utils.c
+@@ -47,7 +47,7 @@ void md5_gen_DISPLAY_ALL_FORMATS()
+ 	cfg_init(CFG_PRIVATE_ALT_NAME, 1);
+ #endif
+ 	cfg_init(CFG_FULL_NAME, 1);
+-	cfg_init(CFG_ALT_NAME, 0);
++	//cfg_init(CFG_ALT_NAME, 0);
+ 
+ 	for (i = 1001; i < 10000; ++i)
+ 	{

@@ -1,0 +1,8 @@
+Patching john was a tad annoying, it required some trial and error.
+ - Config Files and hardcoded filenames needed to be moved around and 
+   turned into variables
+ - argv was passed around, and was used with pointer math.  It had to be 
+   followed by argc and iterated with that instead of pointer math.
+   
+It's important to note that these patches were for john 1.7.8 jumbo 5
+http://www.openwall.com/john/g/john-1.7.8-jumbo-5.tar.gz

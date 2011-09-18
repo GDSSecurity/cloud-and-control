@@ -1,0 +1,148 @@
+diff --git a/src/john.c b/src/john.c
+index fc46036..fc2c058 100644
+--- a/src/john.c
++++ b/src/john.c
+@@ -17,6 +17,12 @@
+ #include <stdlib.h>
+ #include <sys/stat.h>
+ 
++#include <stdarg.h>
++#include <boinc/boinc_api.h>
++#include <boinc/filesys.h>
++
++#define fopen(i,j) boinc_fopen(i,j)
++
+ #include "arch.h"
+ #include "misc.h"
+ #include "params.h"
+@@ -382,7 +388,7 @@ static void john_init(char *name, int argc, char **argv)
+     if (options.flags & FLG_CONFIG_CLI)
+     {
+       cfg_init(options.config, 1);
+-      cfg_init(CFG_ALT_NAME, 0);
++      //cfg_init(CFG_ALT_NAME, 0);
+     }
+     else
+     {
+@@ -391,7 +397,7 @@ static void john_init(char *name, int argc, char **argv)
+ 		cfg_init(CFG_PRIVATE_ALT_NAME, 1);
+ #endif
+ 		cfg_init(CFG_FULL_NAME, 1);
+-		cfg_init(CFG_ALT_NAME, 0);
++		//cfg_init(CFG_ALT_NAME, 0);
+ 	}
+ 	//}
+ 
+@@ -517,8 +523,112 @@ static void john_done(void)
+ 	cleanup_tiny_memory();
+ }
+ 
++#ifdef HAVE_BOINC
++int fail(const char *str,...)
++{
++	va_list ap;
++	va_start(ap,str);
++	vfprintf(stderr,str,ap);
++	va_end(ap);
++	fprintf(stderr,"\n");
++	fflush(stderr);
++	boinc_finish(-1);
++	return -1;
++}
++
++char* POT_NAME = 0;
++char* LOG_NAME = 0;
++char* RECOVERY_NAME = 0;
++char* CFG_FULL_NAME = 0;
++
+ int main(int argc, char **argv)
+ {
++	stdout = stderr;
++
++	int status = boinc_init();
++	if(status)
++		return fail("boinc_init() failed: %d",status);
++		
++	char confFile[512];
++	status = boinc_resolve_filename("john.conf", confFile, sizeof(confFile) );
++	if(status) return fail("cannot resolve john.conf file name");
++	else       fprintf(stderr, "resolved john.conf file to %s\n", confFile);
++	CFG_FULL_NAME = confFile;
++
++	char passlist[512];
++	status = boinc_resolve_filename("passwordlist", passlist, sizeof(passlist) );
++	if(status) return fail("cannot resolve passwordlist file name");
++	else       fprintf(stderr, "resolved passwordlist file to %s\n", passlist);
++	
++	//char potName[512];
++	//status = boinc_resolve_filename("john.pot", potName, sizeof(potName) );
++	//if(status) return fail("cannot resolve john.pot file name");
++	//else       fprintf(stderr, "resolved john.pot file to %s\n", potName);
++	POT_NAME = "john.pot";//potName;
++	
++	char logName[512];
++	status = boinc_resolve_filename("john.log", logName, sizeof(logName) );
++	if(status) return fail("cannot resolve john.log file name");
++	else       fprintf(stderr, "resolved john.log file to %s\n", logName);
++	LOG_NAME = logName;
++	
++	char recName[512];
++	status = boinc_resolve_filename("john.rec", recName, sizeof(recName) );
++	if(status) return fail("cannot resolve john.rec file name");
++	else       fprintf(stderr, "resolved john.rec file to %s\n", recName);
++	RECOVERY_NAME = recName;
++
++	//I'm a dirty, dirty person
++	int i;
++	int newArgc = 2; //One for the appname, one for the passwordfile
++        int hasWordlist = 0;
++        for(i=1; i < argc; i++)
++          {
++            newArgc++;
++            hasWordlist = strstr(argv[i], "<<WORDLIST>>") ? i : hasWordlist;
++          }
++	printf("%i %s\n", argc, argv[0]);
++	char* wordlistName = NULL;
++	char* wordlistParameter = NULL;
++	if(hasWordlist)
++	  {
++	    wordlistName = (char*)malloc(512 * sizeof(char));
++	    status = boinc_resolve_filename("wordlist", wordlistName, 512 );
++	    if(status) return fail("cannot resolve wordlist file name");
++	    else       fprintf(stderr, "resolved wordlist file to %s\n", wordlistName);
++
++	    wordlistParameter = (char*)malloc(612 * sizeof(char));
++	    snprintf(wordlistParameter, 612, "--wordlist=%s", wordlistName);
++	  }
++
++	i=0;
++	char ** newArgv = malloc(newArgc * sizeof(char*));
++	newArgv[i++] = argv[0];
++	for (i=1; i<argc; i++)
++	  {
++	    if(i == hasWordlist)
++	      newArgv[i] = wordlistParameter;
++	    else
++	      newArgv[i] = argv[i];
++	  }
++
++	newArgv[i] = passlist;
++
++	for(i=0; i<newArgc; i++)
++	  fprintf(stderr,"-> %s\n",newArgv[i]);
++
++	int ret = john_main(newArgc, newArgv);
++	boinc_finish(ret);
++	
++	return ret;
++}
++
++
++int john_main(int argc, char **argv)
++#else
++int main(int argc, char **argv)
++#endif
++{
+ 	char *name;
+ 
+ #ifdef _MSC_VER

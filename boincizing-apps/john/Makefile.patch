@@ -1,0 +1,48 @@
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -31,11 +31,12 @@ OMPFLAGS =
+ # icc with OpenMP (for make target linux-x86-64-icc)
+ #OMPFLAGS = -openmp
+ 
+-CFLAGS = -c -Wall -O2 -fomit-frame-pointer -I/usr/local/include $(OMPFLAGS)
++CFLAGS = -c -Wall -O2 -fomit-frame-pointer -I/usr/local/include -DHAVE_BOINC $(OMPFLAGS)
+ # -DHAVE_SKEY
+ ASFLAGS = -c $(OMPFLAGS)
+ LDFLAGS = -s -L/usr/local/lib -L/usr/local/ssl/lib -lcrypto -lssl -lm $(OMPFLAGS)
+ # -lskey
++LDFLAGSBOINC = -lboinc_api -lboinc -lpthread
+ LDFLAGS_SOLARIS = -lrt -lnsl -lsocket
+ LDFLAGS_MKV = -s -lm
+ OPT_NORMAL = -funroll-loops
+@@ -110,10 +111,11 @@ BENCH_OBJS = \
+ GENMKVPWD_OBJS = \
+ 	genmkvpwd.o mkvlib.o memory.o miscnl.o
+ 
+-PROJ = ../run/john ../run/unshadow ../run/unafs ../run/unique ../run/undrop \
++OLDPROJ = ../run/john ../run/unshadow ../run/unafs ../run/unique ../run/undrop \
+ 	../run/ssh2john ../run/pdf2john ../run/rar2john ../run/zip2john \
+ 	../run/genmkvpwd ../run/mkvcalcproba ../run/calc_stat \
+ 	../run/tgtsnarf
++PROJ = ../run/john-boinc
+ PROJ_DOS = ../run/john.bin ../run/john.com \
+ 	../run/unshadow.com ../run/unafs.com ../run/unique.com \
+ 	../run/undrop.com \
+@@ -1075,6 +1077,9 @@ bench: $(BENCH_OBJS)
+ ../run/john: $(JOHN_OBJS)
+ 	$(LD) $(JOHN_OBJS) $(LDFLAGS) -o ../run/john
+ 
++../run/john-boinc: $(JOHN_OBJS)
++	$(LD) $(JOHN_OBJS) $(LDFLAGS) $(LDFLAGSBOINC) -o ../run/john-boinc
++
+ ../run/unshadow: ../run/john
+ 	$(RM) ../run/unshadow
+ 	ln -s john ../run/unshadow
+@@ -1257,7 +1262,7 @@ test_full:
+ 	cd ../test && ./tstall
+ 
+ clean:
+-	$(RM) $(PROJ) $(PROJ_DOS) $(PROJ_WIN32) $(PROJ_WIN32_MINGW)
++	$(RM) $(PROJ) $(OLDPROJ) $(PROJ_DOS) $(PROJ_WIN32) $(PROJ_WIN32_MINGW)
+ 	$(RM) ../run/john.exe john-macosx-* *.o *.bak core
+ 	$(RM) detect bench generic.h arch.h tmp.s
+ 	$(RM) fmt_registers.h fmt_externs.h john_build_rule.h

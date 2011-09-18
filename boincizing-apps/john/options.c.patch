@@ -1,0 +1,20 @@
+--- a/src/options.c
++++ b/src/options.c
+@@ -225,7 +225,7 @@ void opt_init(char *name, int argc, char **argv)
+ 
+ 	options.length = -1;
+ 
+-	opt_process(opt_list, &options.flags, argv);
++	opt_process(opt_list, &options.flags, argc, argv);
+ 
+ 	if ((options.flags &
+ 	    (FLG_EXTERNAL_CHK | FLG_CRACKING_CHK | FLG_MAKECHR_CHK)) ==
+@@ -235,7 +235,7 @@ void opt_init(char *name, int argc, char **argv)
+ 	if (!(options.flags & FLG_ACTION))
+ 		options.flags |= FLG_BATCH_SET;
+ 
+-	opt_check(opt_list, options.flags, argv);
++	opt_check(opt_list, options.flags, argc, argv);
+ 
+ 	if (options.session) {
+ 		rec_name = options.session;
