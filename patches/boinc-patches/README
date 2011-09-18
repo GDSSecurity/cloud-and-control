@@ -23,7 +23,7 @@ client-app-running.patch
 	   Again, causing 'command not recognized' errors, this time with 
 	   cudahashcat+
 client-platform-tomfoolery.patch
-	See TODO
+	See misc-info.txt
 	
 	
 server-moreapps.patch
@@ -38,4 +38,8 @@ server-multithreaded.patch
 	
 server-builddirs.patch	
 client-builddirs.patch
-	TODO
+	BOINC doesn't support an application that has subdirectories.  I wrote
+	a _horrible_ couple patches that add support for this.  Immediately after 
+	doing so, someone remarked that most people just unzip the directories
+	on the client.  I needed this for cudahashcat, and unzipping took 100MB of 
+	files to 1, so I do that now.  So you shouldn't need these patches.

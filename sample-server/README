@@ -1,18 +1,7 @@
 These are the files off of my BOINC server, and show my layout for the 
 applications, templates, and the dashboard I added.
 
-Q: Why do you have such strange platforms?  Per-processor architectures?!
-   Do I need to do that?
-   
-A: No.  I did that in the very beginning when I thought GGNFS performed 
-wildly differently on different processor architectures.  I never changed it.
-But I'll explain how to do this anyway.
-
-1) define your platforms in project.xml
-2) Instead of _linux as your platform, put the custom platform you defined in
-   project.xml
-3) TODO
-   
+Make sure you read misc-notes.txt   
 
 config.xml
 config_aux.xml
