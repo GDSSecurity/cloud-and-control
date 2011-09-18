@@ -10,3 +10,13 @@ YOU WILL NEED TO EDIT THEM BEFORE RUNNING.
    
 msieve-parse.txt
    Parses out data for the polynomial selection runs.  A single SQL Query
+   
+john-parse.php
+   A PHP script that must be run prior to the sql query.  It needs to know
+   the location of the wordlist files, and will make a db table that contains
+   the number of words in each file.
+john-parse.txt
+   The SQL query that will give you a bunch of information like number of 
+   cracks, estimation of floating point operations/word and stuff like that.
+   For non-trivial hash types/longer wordlists, it will show you how close the 
+   estimate came to actual execution.  (Unix MD5, and such).

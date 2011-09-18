@@ -1,0 +1,113 @@
+/* Remember to run the PHP script prior! ============================================= */
+
+SELECT
+	CONCAT(r.name, ' | ', r.resultid),
+	FROM_UNIXTIME(r.received_time - time_total_seconds, '%c/%e/%y %T') as calcedstarttime,
+	r.time,
+	r.cracked,
+	CASE 
+		WHEN ( r.cracked / time_total_seconds ) >= 1 
+			THEN CAST(ROUND( r.cracked / time_total_seconds , 0) AS CHAR(100) CHARACTER SET utf8)
+		WHEN r.cracked > 0 
+			THEN CAST(ROUND( CAST(r.cracked as DECIMAL) / CAST(time_total_seconds as decimal), 2) AS CHAR(100) CHARACTER SET utf8)
+		ELSE '.0000'
+		END as 'crack/sec',
+	r.wordlist as wordlist,
+	wordlistwithrules,
+	r.linesinfile as wordlist_lines,
+	'' as cryptsec,
+	((r.p_fpops * time_total_seconds )
+		/ (r.linesinfile) ) as 'fpops/word',
+	r.host,
+	r.p_fpops * time_total_seconds as actual_fpops,
+	r.rsc_fpops_est as estimated_fpops,
+	case
+		when time_total_seconds = 1 then 'insignificant'
+		else CAST(ROUND(((r.p_fpops * time_total_seconds) / r.rsc_fpops_est) * 100,4) AS CHAR(15))
+		end as percent_of_estimate
+	
+FROM (
+
+SELECT 
+	r.*,
+	GREATEST(1, (r.time_days * 24 * 60 * 60 + time_hours * 60 *60 + time_min * 60 + time_sec)) as time_total_seconds
+FROM (
+
+SELECT
+	r.*,
+	cast(substring_index(time, ':', 1) as unsigned) as time_days,
+	cast(substring(substring_index(time, ':', 2), 3, 2) as unsigned) as time_hours,
+	cast(substring(substring_index(time, ':', -2), 1, 2) as unsigned) as time_min,
+	cast(substring_index(time, ':', -1) as unsigned) as time_sec
+FROM (
+
+SELECT
+	r.id as resultid,
+	r.name,
+	CASE
+		WHEN h.domain_name LIKE '%cidal' THEN h.domain_name
+		WHEN h.p_model LIKE '%Intel(R) Xeon(R) CPU%' THEN 
+			CONCAT('Xeon ', SUBSTRING( trim(replace(h.p_model, 'Intel(R) Xeon(R) CPU ', '')),
+				1, INSTR(trim(replace(h.p_model, 'Intel(R) Xeon(R) CPU ', '')), 'Hz')
+				))
+		WHEN h.p_model LIKE '%Dual-Core AMD Opteron(tm) Processor%' THEN
+			CONCAT('Opteron ', SUBSTRING( replace(h.p_model, 'Dual-Core AMD Opteron(tm) Processor ', ''),
+				1, INSTR(replace(h.p_model, 'Dual-Core AMD Opteron(tm) Processor', ''), '[') - 2
+				))
+		ELSE 'Unknown'
+		END as host,
+	r.hostid,
+	h.p_fpops,
+	w.rsc_fpops_est as rsc_fpops_est,
+	r.received_time,
+	r.sent_time,
+	r2.linesinfile,
+	CAST(trim(substring(stderr_out,
+		instr(stderr_out, 'guesses: ') + 9,
+		instr(stderr_out, 'time: ') - instr(stderr_out, 'guesses: ') - 9
+		)) AS unsigned) as cracked,
+	case
+		when r2.wordlist <> 'bruteforce' then
+			CAST(trim(replace(substring(stderr_out,
+				instr(stderr_out, 'time: ') + 6,
+				instr(stderr_out, 'ETA: ') - instr(stderr_out, 'time: ') - 8
+				), '100.00%', '')) AS CHAR(100) CHARACTER SET utf8) 
+		else
+			CAST(trim(replace(substring(stderr_out,
+				instr(stderr_out, 'time: ') + 6,
+				instr(stderr_out, 'c/s: ') - instr(stderr_out, 'time: ') - 6
+				), '100%', '')) AS CHAR(100) CHARACTER SET utf8)
+		end as time,
+	CAST(trim(replace(substring(stderr_out,
+		instr(stderr_out, 'c/s: ') + 5,
+		instr(stderr_out, 'trying: ') - instr(stderr_out, 'c/s: ') - 5
+		), 'K', '')) AS UNSIGNED) * 1000 as combossec,
+	r2.wordlist,
+	IF(stderr_out like '%--rules%', 1, 0) as wordlistwithrules
+FROM result r
+INNER JOIN result_johnparsed r2
+  on r2.id = r.id
+INNER JOIN workunit w
+  on w.id = r.workunitid
+INNER JOIN app_version av
+  on av.id = r.app_version_id
+INNER JOIN app a
+  on a.id = av.appid
+INNER JOIN host h
+  on r.hostid = h.id
+WHERE a.id IN (18)
+
+and r.server_state = 5
+and outcome = 1
+and client_state = 5
+and validate_state = 1
+
+) r
+
+/* WHERE combossec <> 0 */
+
+) r
+
+) r
+
+/* WHERE time_total_seconds <> 0 */
