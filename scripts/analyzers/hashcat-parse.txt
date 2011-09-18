@@ -1,0 +1,79 @@
+/* Remember to run the PHP script prior! ============================================= */
+
+SELECT
+	CONCAT(name, ' | ', resultid),
+	FROM_UNIXTIME(r.received_time - time_total_seconds, '%c/%e/%y %T') as calcedstarttime,
+	CONCAT(time_days, ':', time_hours, ':', time_minutes, ':', time_seconds) as time,
+	cracked,
+	CASE 
+		WHEN ( cracked / time_total_seconds ) >= 1 
+			THEN CAST(ROUND( cracked / time_total_seconds , 0) AS CHAR(100) CHARACTER SET utf8)
+		WHEN cracked > 0 
+			THEN CAST(ROUND( CAST(cracked as DECIMAL) / CAST(time_total_seconds as decimal), 2) AS CHAR(100) CHARACTER SET utf8)
+		ELSE '.0000'
+		END as 'crack/sec',
+	r.wordlist as wordlist,
+	wordlistwithrules,
+	r.linesinfile as wordlist_lines,
+	cryptsec,
+	((p_fpops * (time_total_seconds - 10) )
+		/ (r.linesinfile) ) as 'fpops/word',
+	r.host,
+	r.p_fpops * time_total_seconds as actual_fpops,
+	r.rsc_fpops_est as estimated_fpops,
+	case
+		when time_total_seconds = 1 then 'insignificant'
+		else CAST(ROUND(((r.p_fpops * time_total_seconds) / r.rsc_fpops_est) * 100,4) AS CHAR(15))
+		end as percent_of_estimate
+FROM (
+
+
+SELECT
+	r.id as resultid,
+	r.name,
+	CASE
+		WHEN h.domain_name LIKE '%cidal' THEN h.domain_name
+		WHEN h.p_model LIKE '%Intel(R) Xeon(R) CPU%' THEN 
+			CONCAT('Xeon ', SUBSTRING( trim(replace(h.p_model, 'Intel(R) Xeon(R) CPU ', '')),
+				1, INSTR(trim(replace(h.p_model, 'Intel(R) Xeon(R) CPU ', '')), 'Hz')
+				))
+		WHEN h.p_model LIKE '%Dual-Core AMD Opteron(tm) Processor%' THEN
+			CONCAT('Opteron ', SUBSTRING( replace(h.p_model, 'Dual-Core AMD Opteron(tm) Processor ', ''),
+				1, INSTR(replace(h.p_model, 'Dual-Core AMD Opteron(tm) Processor', ''), '[') - 2
+				))
+		ELSE 'Unknown'
+		END as host,
+	r.hostid,
+	h.p_fpops,
+	w.rsc_fpops_est as rsc_fpops_est,
+	r.received_time,
+	r.sent_time,
+	r2.cracked,
+	r2.linesinfile,
+	r2.cryptsec,
+	r2.total_sec as time_total_seconds,
+	floor(r2.total_sec / 86400) as time_days,
+	floor((r2.total_sec % 86400) / 3600) as time_hours,
+	floor(((r2.total_sec % 86400) % 3600) / 60) as time_minutes,
+	r2.total_sec % 60 as time_seconds,
+	r2.wordlist,
+	IF(stderr_out like '%--rules-file%', 1, 0) as wordlistwithrules
+FROM result r
+INNER JOIN result_hashcatparsed r2
+  on r2.id = r.id
+INNER JOIN workunit w
+  on w.id = r.workunitid
+INNER JOIN app_version av
+  on av.id = r.app_version_id
+INNER JOIN app a
+  on a.id = av.appid
+INNER JOIN host h
+  on r.hostid = h.id
+WHERE a.id = 28
+and r.server_state = 5
+and outcome = 1
+and client_state = 5
+and validate_state = 1
+
+) r
+

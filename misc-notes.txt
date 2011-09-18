@@ -5,3 +5,10 @@ I was working off BOINC 6.11.1
 	http://boinc.berkeley.edu/trac/wiki/SourceCode
 	http://boinc.berkeley.edu/trac/wiki/BuildSystem
 	
+	
+You'll see I use xz compression in places.  7z doesn't allow streaming 
+compression.  You can't decompress from stdin, you need to give an actual 
+filename.  (So you couldn't 7zcat or 7zless like you can zcat, zless, xzcat, 
+and xzless.)  I decompress in the job.xml files by wiring up stdin and stdout, 
+so I needed a compression function that could do so. xz gives great compression
+and the feature I needed.

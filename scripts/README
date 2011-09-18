@@ -40,6 +40,11 @@ gunzipresults.sh
 	output template.  However, the files don't have the .gz suffix.  This script
 	will run through sample_results, find the gzipped ones, and gunzip them.
 	
+shutdownBoincSlave.sh
+	I used this delayed startup script to know whether or not to shut down my 
+	instances.  I can control them all at once by changing the text file on my
+	webserver.
+	
 	
 =================================================
 Factoring Scripts (in logical order)

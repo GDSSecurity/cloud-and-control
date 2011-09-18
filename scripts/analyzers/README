@@ -20,3 +20,13 @@ john-parse.txt
    cracks, estimation of floating point operations/word and stuff like that.
    For non-trivial hash types/longer wordlists, it will show you how close the 
    estimate came to actual execution.  (Unix MD5, and such).
+   
+hashcat-parse.php
+hashcat-parse.txt
+hashcat-7zwordlist-parse.php
+hashcat-7zwordlist-parse.txt
+cudahashcat+-parse.php
+cudahashcat+-parse.txt
+cudahashcat+-7zwordlist-parse.php
+cudahashcat+-7zwordlist-parse.txt
+	Same

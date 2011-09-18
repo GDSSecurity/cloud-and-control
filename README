@@ -1,0 +1,50 @@
+Contents
+============================================================
+boincizing-apps
+	The patches needed to turn open source apps into apps runnable by boinc.
+	Most of them are easy to read.
+patches
+	The patches made to BOINC itself for a couple obscure features, bugfixes, 
+	and debugging information.
+result-analysis
+	If you'd like to review my math and estimations for the pretty graphs,
+	for GNFS stuff or cracking, here it is. 
+sample-server
+	This is the config files and most importantly templates for the boinc 
+	applications.
+scripts
+	These are the job generation scripts, post-run analysis scripts, and some 
+	other misc scripts.
+wordlists
+	See below.
+
+Be Intelligent
+============================================================
+In general, you're going to want to search for tmp_hostname and replace that 
+with your temporary directory, and overall just read the stuff to see what you 
+have to change.  I didn't make a note of everytime I removed my password and
+put in PASSWORD for you to fill in.
+
+No Wordlists
+============================================================
+I'm not including my wordlists.  Not out of secrecy, I just downloaded every 
+single one I could find, stripped out the copyrights on them, and combined them.  
+So I'm fairly certain doing so would be in violation of the wishes of the 
+authors.  Yea, I know almost no one actually obeys that stuff, but I try to most
+of the time.  You can combine your own wordlists.
+ 
+I am however including the markov-generated wordlists.  Caveat: not actually 
+very useful.
+
+Thanks
+============================================================
+ - The community at @nysecsec
+ - Gotham Digital Science
+ - MersenneForum
+ - jasonp
+ - All the authors of the tools used, including but not limited to:
+   Chris Monico, Brian Gladman, Jeff Gilchrist, solar designer, 
+   atom, David Anderson
+ - The United-TI factoring team, whose code and work greatly 
+   inspired my own
+ - chewy, shingding, nmrw
