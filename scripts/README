@@ -1,0 +1,10 @@
+=================================================
+Factoring Scripts (in logical order)
+=================================================
+Makefile
+mkpolysearchrange.cpp
+	Takes a file containing only the semiprime to be factored, and produces
+	workunits for running in msieve.
+	
+	You will need to edit it to write to the appropriate temp file directory.
+	(Search for tmp_hostname)
