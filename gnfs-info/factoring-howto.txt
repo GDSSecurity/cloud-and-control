@@ -1,0 +1,55 @@
+While there are the perl and python drivers that try to make it 'easy' to do,
+I find it more straightforward to compile and run the tools myself.
+
+1) Download and compile msieve and ggnfs
+   http://sourceforge.net/projects/msieve/
+   http://sourceforge.net/projects/ggnfs/
+
+2) Take the modulus you want and put it, in base 10, in a file.
+   If you're attack a SSL cert, here's the openssl 7 python commands to get it in base 10:
+   $ openssl x509 -noout -modulus -in cert.pem
+   $ python
+   >>> int('hexstring', 16)
+  
+  I'll pretend you put it in rsa100.n
+ 
+3) Run Poly Search.  You may want to distribute this.  Here's how:
+ 
+	./msieve -s ./rsa100.intermediate.dat -l ./rsa100.log -i ./rsa100.n -nf ./rsa100.fb -d 20 -v -np 1,500
+	./msieve -s ./rsa100.intermediate.dat -l ./rsa100.log -i ./rsa100.n -nf ./rsa100.fb -d 20 -v -np 500,1000
+	./msieve -s ./rsa100.intermediate.dat -l ./rsa100.log -i ./rsa100.n -nf ./rsa100.fb -d 20 -v -np 1000,1500
+	...
+ 
+4) Pick the largest Murphy Score
+   The Murphy score is the second-best poly scorer there is.  The best is test
+   sieving.  So unless you want to test sieve, go with the best Murphy Score.
+ 
+5) Convert the msieve output to something GNFS can read.
+   scripts/gengnfsjob.php rsa100.fb
+ 
+6) Sieve an aweful lot.
+   a) Copy the rsa100.job to a whole bunch of job files:
+      rsa100.job.1, rsa100.job.2, rsa100.job.3, ...
+   b) Edit each job file to have a different __START__, and fill in a __COUNT__
+      for the range.
+   c) Run the correct siever.  This is the second siever, and is probably not 
+      correct.	The gengnfsjob.php will tell you the siever to use.
+	  Make sure they write to different output file.
+   
+      gnfs-lasieve4I12e -a -o spairs.out.X -v rsa100.job.X
+ 
+7) Run the combine.
+   Do it with:
+     - x64 box
+	 - gcc >4.1  (e.g. 4.4.5)
+	 - recent gmp (e.g. 5.0.2)
+ 
+   a) cat the individual spairs files into rsa100.dat
+   b) ./msieve -v -s ./rsa100.dat -i ./rsa100.n -nf ./rsa100.fb -t 8 -nc1 -v
+	    Note that -t 8 means use at most 8 threads.
+   c) ./msieve -v -s ./rsa100.dat -i ./rsa100.n -nf ./rsa100.fb -t 8 -nc2 -v
+   d) ./msieve -v -s ./rsa100.dat -i ./rsa100.n -nf ./rsa100.fb -t 8 -nc3 –v
+
+8) Hope.  I have had msieve crash on the last mile.  That's why I gave those
+   version recommendations - I found what worked for me.  Yep, more 
+   superstition than engineering there.

@@ -3,6 +3,8 @@ Contents
 boincizing-apps
 	The patches needed to turn open source apps into apps runnable by boinc.
 	Most of them are easy to read.
+gnfs-info
+	The GNFS-specific slides and docs.
 patches
 	The patches made to BOINC itself for a couple obscure features, bugfixes, 
 	and debugging information.
