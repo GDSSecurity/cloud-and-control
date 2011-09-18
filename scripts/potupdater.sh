@@ -47,7 +47,7 @@ function replacehashcatstyle()
 
 
 
-masterpot="tmp_pseudocidal/masterpotfile_$1"
+masterpot="tmp_hostname/masterpotfile_$1"
 while [ 1 = 1 ];
 do
     potfiles=$(find sample_results/ -maxdepth 1 -name *$1*_0 | wc -l)

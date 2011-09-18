@@ -1,6 +1,20 @@
 =================================================
 Utility Scripts
 =================================================
+john-benchmarker.py
+	I used this script to benchmark different versions of john patches on 
+	different machines, on different hash types so I could see which was the 
+	fastest.  I ultimately didn't use the results, and just settled on running
+	a reasonable john version, compilation options, and patch.
+	You're going to need to read this and change directory paths.
+	
+john-fraction-compare.py
+	For a given version of john and a given 'standard' hash function
+	This will tell you show much longer (or shorter) the other hash functions
+	are to that standard one.  For example, MD5 is 5x faster than crypt, or
+	DES is .05 times faster than crypt (meaning 20x slower)
+	You're going to need to read this and change directory paths.
+
 showmurphy.sh
 	A simple one-liner that will show you the Murphy scores of the polynomials 
 	found so far,

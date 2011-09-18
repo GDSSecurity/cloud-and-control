@@ -4,7 +4,7 @@
 require('genjohnwu-tools.php');
 
 $stamp=strftime("%b%d_%H%M",time());
-$tmpdir="tmp_pseudocidal";
+$tmpdir="tmp_hostname";
 
 $shortopts = "b:c:p:f:a:";
 $longopts = array(
