@@ -48,8 +48,11 @@ I find it more straightforward to compile and run the tools myself.
    b) ./msieve -v -s ./rsa100.dat -i ./rsa100.n -nf ./rsa100.fb -t 8 -nc1 -v
 	    Note that -t 8 means use at most 8 threads.
    c) ./msieve -v -s ./rsa100.dat -i ./rsa100.n -nf ./rsa100.fb -t 8 -nc2 -v
-   d) ./msieve -v -s ./rsa100.dat -i ./rsa100.n -nf ./rsa100.fb -t 8 -nc3 –v
+   d) ./msieve -v -s ./rsa100.dat -i ./rsa100.n -nf ./rsa100.fb -t 8 -nc3 ï¿½v
 
 8) Hope.  I have had msieve crash on the last mile.  That's why I gave those
    version recommendations - I found what worked for me.  Yep, more 
    superstition than engineering there.
+
+9) Use your primes.  You may be interested in this set of scripts:
+   https://github.com/tomrittervg/prime2pem
