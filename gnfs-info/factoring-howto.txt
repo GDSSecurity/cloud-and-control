@@ -1,3 +1,13 @@
+This folder is a subsection of a presentation on distributing high-CPU activities (like factoring) using 
+BOINC (the thing behind SETI@Home).  This is a dry howto of factoring a 512 bit semiprime using the raw tools
+and NOT distributing it using BOINC.  The $140 and 30 hour figure comes when you wire it all up in BOINC so 
+parts are automated and you're not going crazy trying to control 200 computers at once.  (BOINC does that for you.)
+I mean you could try of course, but your Alt+Tabbing would have to be mighty strong. ;)
+
+Likewise, the slides just brush over the math very briefly and don't go into much detail.  (This was afterall a
+spoken presentation.)  The slides in the main directory may shed a little more light on the subject and BOINC:
+  https://github.com/GDSSecurity/cloud-and-control/blob/master/Cloud & Control - notes.txt
+
 While there are the perl and python drivers that try to make it 'easy' to do,
 I find it more straightforward to compile and run the tools myself.
 
